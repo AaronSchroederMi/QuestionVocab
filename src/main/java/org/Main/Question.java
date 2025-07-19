@@ -35,6 +35,9 @@ public class Question {
     public double getConfidence() {
         double correctAnswerCount = getCorrectAnswerCount();
         double askedCount = getAskedCount();
+        if (askedCount < 5 || correctAnswerCount == 0) {
+            return 0;
+        }
         return askedCount / correctAnswerCount;
     }
 
