@@ -11,17 +11,12 @@ public class Question {
     private Map<String, String> answers;
     private String correctAnswer;
     private List<Log> logs;
-    private final LocalDateTime thisSession = LocalDateTime.now();
 
 
-    public List<Log> getLogOfThisSession() {
-        return logs.stream()
-                .filter(localTimeDate -> localTimeDate.getTimestamp().isAfter(thisSession))
-                .toList();
-    }
+
     public List<Log> getLogOfToday() {
         return logs.stream()
-                .filter(localTimeDate -> localTimeDate.getTimestamp().toLocalDate().isEqual(ChronoLocalDate.from(thisSession)))
+                .filter(localTimeDate -> localTimeDate.getTimestamp().toLocalDate().isEqual(ChronoLocalDate.from(LocalDateTime.now())))
                 .toList();
     }
     public int getAskedCount() {
@@ -41,20 +36,25 @@ public class Question {
         return askedCount / correctAnswerCount;
     }
 
+    public void addLog(Log log) {
+        logs.add(log);
+    }
+    public void clearLogs() {
+        logs.clear();
+    }
+
     public int getId() {
         return id;
     }
     public String getQuestion() {
         return question;
     }
-
     public String getCorrectAnswer() {
         return correctAnswer;
     }
     public List<Log> getLogs() {
         return logs;
     }
-
     public Map<String, String> getAnswers() {
         return answers;
     }
