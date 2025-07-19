@@ -1,20 +1,122 @@
 package org.Main;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class Main extends Application {
-    @Override
-    public void start(Stage stage) {
-        StackPane root = new StackPane();
-        Scene scene = new Scene(root, 400, 300);
+import java.util.ArrayList;
+import java.util.List;
 
-        stage.setTitle("VocabQuiz");
+public class Main extends Application {
+    private BorderPane root;
+    private List<Button> navButtons = new ArrayList<Button>();
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        root = new BorderPane();
+
+        HBox navbar = new HBox();
+        navbar.getStyleClass().add("navbar");
+
+        Button home = new Button("Home");
+        home.setOnAction(e -> {
+            selectButton(home);
+
+        });
+        Button stats = new Button("Stats");
+        home.setOnAction(e -> {
+            selectButton(stats);
+
+        });
+        Button settings = new Button("Settings");
+        home.setOnAction(e -> {
+            selectButton(settings);
+
+        });
+        Button about = new Button("About");
+        home.setOnAction(e -> {
+            selectButton(about);
+
+        });
+
+        navButtons.addAll(List.of(home, stats, settings, about));
+        navbar.getChildren().addAll(home, stats, settings, about);
+        root.setTop(navbar);
+
+        home.setOnAction(e -> showHome());
+        stats.setOnAction(e -> showStats());
+        settings.setOnAction(e -> showSettings());
+        about.setOnAction(e -> showAbout());
+
+        showHome();
+
+        Scene scene = new Scene(root, 400, 300);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
+        stage.setTitle("Question -- Quiz");
         stage.show();
+    }
+
+    private void selectButton(Button button) {
+        for (Button b: navButtons) {
+            b.getStyleClass().remove("selected");
+        }
+        button.getStyleClass().add("selected");
+    }
+
+    private void showHome() {
+        GridPane answers = ButtonGrid();
+        root.setCenter(answers);
+    }
+    private static GridPane ButtonGrid() {
+        Button btn1 = new Button("A");
+        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn1.getStyleClass().add("A");
+        Button btn2 = new Button("B");
+        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn2.getStyleClass().add("B");
+        Button btn3 = new Button("C");
+        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn3.getStyleClass().add("C");
+        Button btn4 = new Button("D");
+        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn4.getStyleClass().add("D");
+
+        GridPane grid = new GridPane();
+        grid.add(btn1, 0, 0);
+        grid.add(btn2, 1, 0);
+        grid.add(btn3, 0, 1);
+        grid.add(btn4, 1, 1);
+        grid.setAlignment(Pos.CENTER);
+        grid.setStyle("-fx-padding: 5;");
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(100);
+        RowConstraints row1 = new RowConstraints();
+        row1.setPercentHeight(30);
+        RowConstraints row2 = new RowConstraints();
+        row2.setPercentHeight(30);
+
+        grid.getColumnConstraints().addAll(col1, col2);
+        grid.getRowConstraints().addAll(row1, row2);
+        return grid;
+    }
+
+    private void showAbout() {
+
+    }
+
+    private void showSettings() {
+
+    }
+
+    private void showStats() {
+
     }
 
     public static void main(String[] args) {

@@ -1,0 +1,43 @@
+.button {
+    -fx-background-color: #003566;
+    -fx-text-fill: #ffd60a;
+    -fx-font-size: 14px;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+}
+
+.button:hover {
+    -fx-background-color: #003566;
+    -fx-border-color: #ffd60a;
+}
+
+.button.selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.navbar {
+    -fx-spacing: 2;
+    -fx-padding: 2;
+    -fx-background-color: #d9d9d9;
+}
+
+.A {
+    -fx-background-color: #ef476f;
+}
+
+.B {
+    -fx-background-color: #ffd166;
+}
+
+.C {
+    -fx-background-color: #06d6a0;
+}
+
+.D {
+    -fx-background-color: #118ab2;
+}
