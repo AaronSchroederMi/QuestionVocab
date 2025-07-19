@@ -21,18 +21,18 @@ Bsp.:
 ```JSON
 [
   {
-    "question_id": "001",
-    "question_text": "Was ist die Hauptstadt von Deutschland?",
+    "id": 1,
+    "question": "Was ist die Hauptstadt von Deutschland?",
     "answers": {
       "A": "Berlin",
       "B": "München",
       "C": "Hamburg",
       "D": "Köln"
     },
-    "correct_answer": "A",
+    "correctAnswer": "A",
     "logs": [
-      {"timestamp": "2025-07-18T15:32:00Z", "correct": true},
-      {"timestamp": "2025-07-18T16:14:00Z", "correct": false}
+      {"timestamp": "2025-07-19T10:23:00", "correct": true},
+      {"timestamp": "2025-07-19T10:23:00", "correct": false}
     ]
   },
   ...
