@@ -11,6 +11,33 @@
 ### Add multiple `question files`
 ### Optional: load random image from `directory` for each question
 ## 2. What is the form of the File that is read in?
+**Geplant ist eine JSON die folgendes Enthält:** 
+- Die Frage
+- Antwortmöglichkeiten (A-D)
+- Richtige Antwort
+- Liste von Log je Frage (Timestamp richtig/falsch)
+
+Bsp.:
+```JSON
+[
+  {
+    "question_id": "001",
+    "question_text": "Was ist die Hauptstadt von Deutschland?",
+    "answers": {
+      "A": "Berlin",
+      "B": "München",
+      "C": "Hamburg",
+      "D": "Köln"
+    },
+    "correct_answer": "A",
+    "logs": [
+      {"timestamp": "2025-07-18T15:32:00Z", "correct": true},
+      {"timestamp": "2025-07-18T16:14:00Z", "correct": false}
+    ]
+  },
+  ...
+]
+```
 ## 3. How should stats be shown?
 ### Asked vs. Unasked ratio (Pie-Chart)
 #### Correctly vs. Incorrectly ratio (Pie-Chart)
