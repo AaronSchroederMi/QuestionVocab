@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation 'org.openjfx:javafx-controls:24.0.2'
     implementation 'org.openjfx:javafx-fxml:24.0.2'
+    implementation 'com.google.code.gson:gson:2.13.1'
 }
 
 application {
