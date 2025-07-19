@@ -11,7 +11,7 @@ public class Question {
     private Map<String, String> answers;
     private String correctAnswer;
     private List<Log> logs;
-    private LocalDateTime thisSession = LocalDateTime.now();
+    private final LocalDateTime thisSession = LocalDateTime.now();
 
 
     public List<Log> getLogOfThisSession() {
