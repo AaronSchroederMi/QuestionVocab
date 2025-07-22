@@ -71,7 +71,6 @@ public class Main extends Application {
         view.setSmooth(true);
 
         StackPane pane = new StackPane(view);
-        pane.setStyle("-fx-background-color: #9ED; -fx-border-color: red;");
 
         VBox layout = new VBox(pane, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
