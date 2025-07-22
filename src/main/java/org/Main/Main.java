@@ -84,14 +84,21 @@ public class Main extends Application {
             imageDir = new File(imageSource.toString());
             loadedImages = imageDir.listFiles();
         }
+        showHome();
     }
     private void removeImageDirectory() {
 
     }
     private void showHome() {
         GridPane answers = ButtonGrid();
-        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Screenshot (1).png")));
-        ImageView view = new ImageView(image);
+        ImageView view = new ImageView();
+
+        int ran = (int) (Math.random() * loadedImages.length);
+        if (loadedImages.length != 0) {
+            Image image = new Image(loadedImages[ran].toURI().toString());
+            view.setImage(image);
+        }
+
         view.setPreserveRatio(true);
         view.setSmooth(true);
 
