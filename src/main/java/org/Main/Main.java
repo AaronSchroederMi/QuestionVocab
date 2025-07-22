@@ -40,6 +40,7 @@ public class Main extends Application {
     private final Set<Path> quizPaths = new HashSet<>();
     private final Set<File> quizFiles = new HashSet<>();
     private final List<Question> questions = new ArrayList<>();
+    private int upperQuarterQuestionSeed;
 
 
     @Override
@@ -94,6 +95,18 @@ public class Main extends Application {
         btn3.setOnAction(this::actionCheckAnswer);
         btn4.setOnAction(this::actionCheckAnswer);
         //---Actions---
+
+        if (!questions.isEmpty()) {
+            questions.sort(Comparator.comparing(Question::getConfidence).reversed());
+            upperQuarterQuestionSeed = (int) (Math.random() * (questions.size() * 0.25));
+            System.out.println(upperQuarterQuestionSeed);
+            System.out.println(questions.get(upperQuarterQuestionSeed).getConfidence());
+
+            btn1.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("A"));
+            btn2.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("B"));
+            btn3.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("C"));
+            btn4.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("D"));
+        }
 
         grid.getColumnConstraints().addAll(col1, col2);
         return grid;
@@ -174,6 +187,7 @@ public class Main extends Application {
                 }
                 questions.addAll(gson.fromJson(fileReader, questionListType));
             }
+            showHome();
         }
     }
     private void actionRemoveQuiz() {
@@ -215,6 +229,14 @@ public class Main extends Application {
 
     private void showHome() {
         GridPane answers = ButtonGrid();
+
+        Label questionsLabel = new Label();
+        questionsLabel.setAlignment(Pos.CENTER);
+
+        if (!questions.isEmpty()) {
+            questionsLabel.setText(questions.get(upperQuarterQuestionSeed).getQuestion());
+        }
+
         ImageView view = new ImageView();
 
         int ran = (int) (Math.random() * imageCount);
@@ -228,7 +250,7 @@ public class Main extends Application {
 
         StackPane pane = new StackPane(view);
 
-        VBox layout = new VBox(pane, answers);
+        VBox layout = new VBox(pane, questionsLabel, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
 
         view.fitWidthProperty().bind(root.widthProperty());
