@@ -21,35 +21,34 @@ public class Main extends Application {
         HBox navbar = new HBox();
         navbar.getStyleClass().add("navbar");
 
+        MenuItem addQuiz = new MenuItem("Add Quiz");
+        MenuItem removeQuiz = new MenuItem("Remove Quiz");
+        MenuItem resetQuizStats = new MenuItem("Reset Quiz Stats");
+        MenuItem addImageDirectory = new MenuItem("Add Image Directory");
+        MenuItem removeImageDirectory = new MenuItem("Remove Image Directory");
+        MenuButton menuList = new MenuButton("File", null,
+                addQuiz,
+                removeQuiz,
+                resetQuizStats,
+                addImageDirectory,
+                removeImageDirectory);
+
         Button home = new Button("Home");
-        home.setOnAction(e -> {
-            selectButton(home);
-
-        });
         Button stats = new Button("Stats");
-        home.setOnAction(e -> {
-            selectButton(stats);
-
-        });
         Button settings = new Button("Settings");
-        home.setOnAction(e -> {
-            selectButton(settings);
-
-        });
         Button about = new Button("About");
-        home.setOnAction(e -> {
-            selectButton(about);
 
-        });
-
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
         navButtons.addAll(List.of(home, stats, settings, about));
-        navbar.getChildren().addAll(home, stats, settings, about);
-        root.setTop(navbar);
+        navbar.getChildren().addAll(menuList, spacer, home, stats, settings, about);
 
         home.setOnAction(e -> showHome());
         stats.setOnAction(e -> showStats());
         settings.setOnAction(e -> showSettings());
         about.setOnAction(e -> showAbout());
+
+        root.setTop(navbar);
 
         showHome();
 
