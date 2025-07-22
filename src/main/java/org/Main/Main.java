@@ -2,6 +2,7 @@ package org.Main;
 
 import javafx.application.Application;
 
+import javafx.event.Event;
 import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
@@ -50,7 +51,8 @@ public class Main extends Application {
         stage.setMinHeight(500);
         stage.show();
     }
-    private static GridPane ButtonGrid() {
+
+    private GridPane ButtonGrid() {
         Button btn1 = new Button("A");
         btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn1.getStyleClass().add("A");
@@ -76,6 +78,13 @@ public class Main extends Application {
         col1.setPercentWidth(100);
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setPercentWidth(100);
+
+        //---Actions---
+        btn1.setOnAction(this::actionCheckAnswer);
+        btn2.setOnAction(this::actionCheckAnswer);
+        btn3.setOnAction(this::actionCheckAnswer);
+        btn4.setOnAction(this::actionCheckAnswer);
+        //---Actions---
 
         grid.getColumnConstraints().addAll(col1, col2);
         return grid;
@@ -107,11 +116,11 @@ public class Main extends Application {
         navbar.getChildren().addAll(menuList, loadedInfo, spacer, home, stats, settings, about);
 
         //--- Actions ---
-        addQuiz.setOnAction(_ -> addQuiz());
-        removeQuiz.setOnAction(_ -> removeQuiz());
-        resetQuizStats.setOnAction(_ -> resetQuizStats());
-        addImageDirectory.setOnAction(_ -> addImageDirectory());
-        removeImageDirectory.setOnAction(_ -> removeImageDirectory());
+        addQuiz.setOnAction(_ -> actionAddQuiz());
+        removeQuiz.setOnAction(_ -> actionRemoveQuiz());
+        resetQuizStats.setOnAction(_ -> actionResetQuizStats());
+        addImageDirectory.setOnAction(_ -> actionAddImageDirectory());
+        removeImageDirectory.setOnAction(_ -> actionRemoveImageDirectory());
 
         home.setOnAction(_ -> showHome());
         stats.setOnAction(_ -> showStats());
@@ -121,16 +130,19 @@ public class Main extends Application {
         return navbar;
     }
 
-    private void addQuiz() {
+    private void actionCheckAnswer(Event source) {
+        System.out.println(source);
+    }
+    private void actionAddQuiz() {
 
     }
-    private void removeQuiz() {
+    private void actionRemoveQuiz() {
 
     }
-    private void resetQuizStats() {
+    private void actionResetQuizStats() {
 
     }
-    private void addImageDirectory() {
+    private void actionAddImageDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select Directory");
         File selectedDirectory = directoryChooser.showDialog(primaryStage);
@@ -152,7 +164,7 @@ public class Main extends Application {
         }
         showHome();
     }
-    private void removeImageDirectory() {
+    private void actionRemoveImageDirectory() {
         imageSource = null;
         imageDir = null;
         loadedImages = new File[0];
