@@ -22,7 +22,7 @@ import java.util.Objects;
 public class Main extends Application {
     private Stage primaryStage;
     private BorderPane root;
-    private final Label loadedInfo = new Label("Loaded " + 0 + "images, from: ");
+    private final Label loadedInfo = new Label("Loaded " + 0 + " images, from: ");
 
     private final List<Button> navButtons = new ArrayList<>();
 
@@ -147,7 +147,7 @@ public class Main extends Application {
                         )
                         .toArray(File[]::new);
                 imageCount = loadedImages.length;
-                loadedInfo.setText("Loaded " + imageCount + "images, from: " + imageSource);
+                loadedInfo.setText("Loaded " + imageCount + " images, from: " + imageDir.getName());
             }
         }
         showHome();
@@ -157,6 +157,7 @@ public class Main extends Application {
         imageDir = null;
         loadedImages = new File[0];
         imageCount = 0;
+        loadedInfo.setText("Loaded " + imageCount + " images, from: ");
         showHome();
     }
 
