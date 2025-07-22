@@ -27,6 +27,8 @@ public class Main extends Application {
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Question -- Quiz");
+        stage.setMinHeight(300);
+        stage.setMinWidth(300);
         stage.show();
     }
 
