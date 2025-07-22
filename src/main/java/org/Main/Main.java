@@ -1,5 +1,7 @@
 package org.Main;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import javafx.application.Application;
 
 import javafx.event.Event;
@@ -11,19 +13,22 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Main extends Application {
     private Stage primaryStage;
     private BorderPane root;
-    private final Label loadedInfo = new Label("Loaded " + 0 + " images, from: ");
+    private final Label loadedInfo = new Label();
 
     private final List<Button> navButtons = new ArrayList<>();
 
@@ -31,6 +36,10 @@ public class Main extends Application {
     private File imageDir;
     private File[] loadedImages = new File[0];
     private int imageCount = 0;
+
+    private final Set<Path> quizPaths = new HashSet<>();
+    private final Set<File> quizFiles = new HashSet<>();
+    private final List<Question> questions = new ArrayList<>();
 
 
     @Override
@@ -134,7 +143,38 @@ public class Main extends Application {
         System.out.println(source);
     }
     private void actionAddQuiz() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open a Quiz (JSON)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
 
+        if (selectedFile != null) {
+            quizPaths.add(Path.of(selectedFile.getAbsolutePath()));
+            quizFiles.add(selectedFile);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                            (json, _, context) -> LocalDateTime.parse(json.getAsString()))
+                    .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
+                            (dateTime, _, context) -> new JsonPrimitive(dateTime.format(formatter)))
+                    .setPrettyPrinting()
+                    .create();
+
+            Type questionListType = new TypeToken<ArrayList<Question>>() {}.getType();
+            for (Path path : quizPaths) {
+                FileReader fileReader;
+                try {
+                    fileReader = new FileReader(String.valueOf(path));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    quizPaths.remove(path);
+                    quizFiles.remove(path.toFile());
+                    break;
+                }
+                questions.addAll(gson.fromJson(fileReader, questionListType));
+            }
+        }
     }
     private void actionRemoveQuiz() {
 
@@ -149,7 +189,7 @@ public class Main extends Application {
 
         if (selectedDirectory != null) {
             imageSource = Path.of(selectedDirectory.getAbsolutePath());
-            imageDir = new File(imageSource.toString());
+            imageDir = selectedDirectory;
             loadedImages = imageDir.listFiles();
             if (loadedImages != null) {
                 loadedImages = Arrays.stream(loadedImages)
@@ -169,7 +209,7 @@ public class Main extends Application {
         imageDir = null;
         loadedImages = new File[0];
         imageCount = 0;
-        loadedInfo.setText("Loaded " + imageCount + " images, from: ");
+        loadedInfo.setText("");
         showHome();
     }
 
