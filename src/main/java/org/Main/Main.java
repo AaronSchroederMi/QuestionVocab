@@ -87,7 +87,10 @@ public class Main extends Application {
         showHome();
     }
     private void removeImageDirectory() {
-
+        imageSource = null;
+        imageDir = null;
+        loadedImages = new File[0];
+        showHome();
     }
     private void showHome() {
         GridPane answers = ButtonGrid();
