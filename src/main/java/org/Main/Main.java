@@ -15,17 +15,21 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class Main extends Application {
     private Stage primaryStage;
     private BorderPane root;
+    private final Label loadedInfo = new Label("Loaded " + 0 + "images, from: ");
+
     private final List<Button> navButtons = new ArrayList<>();
 
     private Path imageSource;
     private File imageDir;
     private File[] loadedImages = new File[0];
+    private int imageCount = 0;
 
 
     @Override
@@ -38,12 +42,12 @@ public class Main extends Application {
 
         showHome();
 
-        Scene scene = new Scene(root, 400, 300);
+        Scene scene = new Scene(root, 700, 500);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Question -- Quiz");
-        stage.setMinHeight(300);
-        stage.setMinWidth(300);
+        stage.setMinWidth(600);
+        stage.setMinHeight(500);
         stage.show();
     }
     private static GridPane ButtonGrid() {
@@ -100,7 +104,7 @@ public class Main extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         navButtons.addAll(List.of(home, stats, settings, about));
-        navbar.getChildren().addAll(menuList, spacer, home, stats, settings, about);
+        navbar.getChildren().addAll(menuList, loadedInfo, spacer, home, stats, settings, about);
 
         //--- Actions ---
         addQuiz.setOnAction(_ -> addQuiz());
@@ -135,6 +139,16 @@ public class Main extends Application {
             imageSource = Path.of(selectedDirectory.getAbsolutePath());
             imageDir = new File(imageSource.toString());
             loadedImages = imageDir.listFiles();
+            if (loadedImages != null) {
+                loadedImages = Arrays.stream(loadedImages)
+                        .filter(image -> image.getName().endsWith(".jpg")
+                                || image.getName().endsWith(".png")
+                                || image.getName().endsWith(".jpeg")
+                        )
+                        .toArray(File[]::new);
+                imageCount = loadedImages.length;
+                loadedInfo.setText("Loaded " + imageCount + "images, from: " + imageSource);
+            }
         }
         showHome();
     }
@@ -142,13 +156,15 @@ public class Main extends Application {
         imageSource = null;
         imageDir = null;
         loadedImages = new File[0];
+        imageCount = 0;
         showHome();
     }
+
     private void showHome() {
         GridPane answers = ButtonGrid();
         ImageView view = new ImageView();
 
-        int ran = (int) (Math.random() * loadedImages.length);
+        int ran = (int) (Math.random() * imageCount);
         if (loadedImages.length != 0) {
             Image image = new Image(loadedImages[ran].toURI().toString());
             view.setImage(image);
@@ -167,15 +183,12 @@ public class Main extends Application {
 
         root.setCenter(layout);
     }
-
     private void showStats() {
         root.setCenter(new TextField("Stats"));
     }
-
     private void showSettings() {
         root.setCenter(new TextField("Settings"));
     }
-
     private void showAbout() {
         root.setCenter(new TextField("ABOUT"));
     }
