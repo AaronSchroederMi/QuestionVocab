@@ -18,6 +18,19 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         root = new BorderPane();
 
+        HBox navbar = navbar();
+        root.setTop(navbar);
+
+        showHome();
+
+        Scene scene = new Scene(root, 400, 300);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Question -- Quiz");
+        stage.show();
+    }
+
+    private HBox navbar() {
         HBox navbar = new HBox();
         navbar.getStyleClass().add("navbar");
 
@@ -47,23 +60,7 @@ public class Main extends Application {
         stats.setOnAction(e -> showStats());
         settings.setOnAction(e -> showSettings());
         about.setOnAction(e -> showAbout());
-
-        root.setTop(navbar);
-
-        showHome();
-
-        Scene scene = new Scene(root, 400, 300);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        stage.setScene(scene);
-        stage.setTitle("Question -- Quiz");
-        stage.show();
-    }
-
-    private void selectButton(Button button) {
-        for (Button b: navButtons) {
-            b.getStyleClass().remove("selected");
-        }
-        button.getStyleClass().add("selected");
+        return navbar;
     }
 
     private void showHome() {
