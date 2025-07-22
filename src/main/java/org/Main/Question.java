@@ -33,7 +33,7 @@ public class Question {
         if (askedCount < 5 || correctAnswerCount == 0) {
             return 0;
         }
-        return askedCount / correctAnswerCount;
+        return correctAnswerCount / askedCount;
     }
 
     public void addLog(Log log) {
