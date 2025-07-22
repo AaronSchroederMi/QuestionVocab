@@ -65,6 +65,29 @@ public class Main extends Application {
         return navbar;
     }
 
+    private void addQuiz() {
+
+    }
+    private void removeQuiz() {
+
+    }
+    private void resetQuizStats() {
+
+    }
+    private void addImageDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Directory");
+        File selectedDirectory = directoryChooser.showDialog(primaryStage);
+
+        if (selectedDirectory != null) {
+            imageSource = Path.of(selectedDirectory.getAbsolutePath());
+            imageDir = new File(imageSource.toString());
+            loadedImages = imageDir.listFiles();
+        }
+    }
+    private void removeImageDirectory() {
+
+    }
     private void showHome() {
         GridPane answers = ButtonGrid();
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Screenshot (1).png")));
