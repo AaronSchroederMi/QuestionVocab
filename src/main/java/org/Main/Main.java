@@ -16,13 +16,21 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Main extends Application {
+    private Stage primaryStage;
     private BorderPane root;
-    private List<Button> navButtons = new ArrayList<Button>();
+    private final List<Button> navButtons = new ArrayList<>();
+
+    private Path imageSource;
+    private File imageDir;
+    private File[] loadedImages = new File[0];
+
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
+        primaryStage = stage;
         root = new BorderPane();
 
         HBox navbar = navbar();
@@ -31,14 +39,43 @@ public class Main extends Application {
         showHome();
 
         Scene scene = new Scene(root, 400, 300);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Question -- Quiz");
         stage.setMinHeight(300);
         stage.setMinWidth(300);
         stage.show();
     }
+    private static GridPane ButtonGrid() {
+        Button btn1 = new Button("A");
+        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn1.getStyleClass().add("A");
+        Button btn2 = new Button("B");
+        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn2.getStyleClass().add("B");
+        Button btn3 = new Button("C");
+        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn3.getStyleClass().add("C");
+        Button btn4 = new Button("D");
+        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn4.getStyleClass().add("D");
 
+        GridPane grid = new GridPane();
+        grid.add(btn1, 0, 0);
+        grid.add(btn2, 1, 0);
+        grid.add(btn3, 0, 1);
+        grid.add(btn4, 1, 1);
+        grid.setAlignment(Pos.BOTTOM_CENTER);
+        grid.setStyle("-fx-padding: 5;");
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(100);
+
+        grid.getColumnConstraints().addAll(col1, col2);
+        return grid;
+    }
     private HBox navbar() {
         HBox navbar = new HBox();
         navbar.getStyleClass().add("navbar");
@@ -65,10 +102,18 @@ public class Main extends Application {
         navButtons.addAll(List.of(home, stats, settings, about));
         navbar.getChildren().addAll(menuList, spacer, home, stats, settings, about);
 
-        home.setOnAction(e -> showHome());
-        stats.setOnAction(e -> showStats());
-        settings.setOnAction(e -> showSettings());
-        about.setOnAction(e -> showAbout());
+        //--- Actions ---
+        addQuiz.setOnAction(_ -> addQuiz());
+        removeQuiz.setOnAction(_ -> removeQuiz());
+        resetQuizStats.setOnAction(_ -> resetQuizStats());
+        addImageDirectory.setOnAction(_ -> addImageDirectory());
+        removeImageDirectory.setOnAction(_ -> removeImageDirectory());
+
+        home.setOnAction(_ -> showHome());
+        stats.setOnAction(_ -> showStats());
+        settings.setOnAction(_ -> showSettings());
+        about.setOnAction(_ -> showAbout());
+        //--- Action ---
         return navbar;
     }
 
@@ -122,52 +167,17 @@ public class Main extends Application {
 
         root.setCenter(layout);
     }
-    private static GridPane ButtonGrid() {
-        Button btn1 = new Button("A");
-        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn1.getStyleClass().add("A");
-        Button btn2 = new Button("B");
-        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn2.getStyleClass().add("B");
-        Button btn3 = new Button("C");
-        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn3.getStyleClass().add("C");
-        Button btn4 = new Button("D");
-        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn4.getStyleClass().add("D");
 
-        GridPane grid = new GridPane();
-        grid.add(btn1, 0, 0);
-        grid.add(btn2, 1, 0);
-        grid.add(btn3, 0, 1);
-        grid.add(btn4, 1, 1);
-        grid.setAlignment(Pos.BOTTOM_CENTER);
-        grid.setStyle("-fx-padding: 5;");
-
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPercentWidth(100);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPercentWidth(100);
-        RowConstraints row1 = new RowConstraints();
-        row1.setPercentHeight(30);
-        RowConstraints row2 = new RowConstraints();
-        row2.setPercentHeight(30);
-
-        grid.getColumnConstraints().addAll(col1, col2);
-        grid.getRowConstraints().addAll(row1, row2);
-        return grid;
-    }
-
-    private void showAbout() {
-
+    private void showStats() {
+        root.setCenter(new TextField("Stats"));
     }
 
     private void showSettings() {
-
+        root.setCenter(new TextField("Settings"));
     }
 
-    private void showStats() {
-
+    private void showAbout() {
+        root.setCenter(new TextField("ABOUT"));
     }
 
     public static void main(String[] args) {
