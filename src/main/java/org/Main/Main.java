@@ -69,7 +69,21 @@ public class Main extends Application {
 
     private void showHome() {
         GridPane answers = ButtonGrid();
-        root.setCenter(answers);
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Screenshot (1).png")));
+        ImageView view = new ImageView(image);
+        view.setPreserveRatio(true);
+        view.setSmooth(true);
+
+        StackPane pane = new StackPane(view);
+        pane.setStyle("-fx-background-color: #9ED; -fx-border-color: red;");
+
+        VBox layout = new VBox(pane, answers);
+        VBox.setVgrow(pane, Priority.ALWAYS);
+
+        view.fitWidthProperty().bind(root.widthProperty());
+        view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty()));
+
+        root.setCenter(layout);
     }
     private static GridPane ButtonGrid() {
         Button btn1 = new Button("A");
@@ -90,7 +104,7 @@ public class Main extends Application {
         grid.add(btn2, 1, 0);
         grid.add(btn3, 0, 1);
         grid.add(btn4, 1, 1);
-        grid.setAlignment(Pos.CENTER);
+        grid.setAlignment(Pos.BOTTOM_CENTER);
         grid.setStyle("-fx-padding: 5;");
 
         ColumnConstraints col1 = new ColumnConstraints();
