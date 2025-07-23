@@ -6,8 +6,8 @@ public class Log {
     private LocalDateTime timestamp;
     private boolean correct;
 
-    Log(LocalDateTime time, boolean correctAnswer) {
-        this.timestamp = time;
+    Log(boolean correctAnswer) {
+        this.timestamp = LocalDateTime.now();
         this.correct = correctAnswer;
     }
 
