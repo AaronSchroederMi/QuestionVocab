@@ -24,11 +24,13 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
     private Stage primaryStage;
     private BorderPane root;
     private final Label loadedInfo = new Label();
+    private final Label questionLabel = new Label();
 
     private final List<Button> navButtons = new ArrayList<>();
 
@@ -39,7 +41,7 @@ public class Main extends Application {
 
     private final Set<Path> quizPaths = new HashSet<>();
     private final Set<File> quizFiles = new HashSet<>();
-    private final List<Question> questions = new ArrayList<>();
+    private final List<ArrayList<Question>> questions = new ArrayList<>();
     private int upperQuarterQuestionSeed;
 
 
@@ -97,15 +99,18 @@ public class Main extends Application {
         //---Actions---
 
         if (!questions.isEmpty()) {
-            questions.sort(Comparator.comparing(Question::getConfidence).reversed());
-            upperQuarterQuestionSeed = (int) (Math.random() * (questions.size() * 0.25));
+            List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
+            tmp.sort(Comparator.comparing(Question::getConfidence).reversed());
+            upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
             System.out.println(upperQuarterQuestionSeed);
-            System.out.println(questions.get(upperQuarterQuestionSeed).getConfidence());
+            System.out.println(tmp.get(upperQuarterQuestionSeed).getConfidence());
 
-            btn1.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("A"));
-            btn2.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("B"));
-            btn3.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("C"));
-            btn4.setText(questions.get(upperQuarterQuestionSeed).getAnswers().get("D"));
+            btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
+            btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
+            btn3.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("C"));
+            btn4.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("D"));
+
+            questionLabel.setText(tmp.get(upperQuarterQuestionSeed).getQuestion());
         }
 
         grid.getColumnConstraints().addAll(col1, col2);
@@ -185,7 +190,7 @@ public class Main extends Application {
                     quizFiles.remove(path.toFile());
                     break;
                 }
-                questions.addAll(gson.fromJson(fileReader, questionListType));
+                questions.add(gson.fromJson(fileReader, questionListType));
             }
             showHome();
         }
@@ -230,12 +235,7 @@ public class Main extends Application {
     private void showHome() {
         GridPane answers = ButtonGrid();
 
-        Label questionsLabel = new Label();
-        questionsLabel.setAlignment(Pos.CENTER);
-
-        if (!questions.isEmpty()) {
-            questionsLabel.setText(questions.get(upperQuarterQuestionSeed).getQuestion());
-        }
+        questionLabel.setAlignment(Pos.CENTER);
 
         ImageView view = new ImageView();
 
@@ -250,7 +250,7 @@ public class Main extends Application {
 
         StackPane pane = new StackPane(view);
 
-        VBox layout = new VBox(pane, questionsLabel, answers);
+        VBox layout = new VBox(pane, questionLabel, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
 
         view.fitWidthProperty().bind(root.widthProperty());
