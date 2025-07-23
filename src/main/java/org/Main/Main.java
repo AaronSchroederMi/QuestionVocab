@@ -2,9 +2,10 @@ package org.Main;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 
-import javafx.event.Event;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,14 +34,15 @@ public class Main extends Application {
     private final Label questionLabel = new Label();
 
     private final List<Button> navButtons = new ArrayList<>();
+    private final List<Button> answerButtons = new ArrayList<>();
 
     private Path imageSource;
     private File imageDir;
     private File[] loadedImages = new File[0];
     private int imageCount = 0;
 
-    private final Set<Path> quizPaths = new HashSet<>();
-    private final Set<File> quizFiles = new HashSet<>();
+    private final List<Path> quizPaths = new ArrayList<>();
+    private final List<File> quizFiles = new ArrayList<>();
     private final List<ArrayList<Question>> questions = new ArrayList<>();
     private int upperQuarterQuestionSeed;
 
@@ -77,6 +80,12 @@ public class Main extends Application {
         btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn4.getStyleClass().add("D");
 
+        answerButtons.clear();
+        answerButtons.add(btn1);
+        answerButtons.add(btn2);
+        answerButtons.add(btn3);
+        answerButtons.add(btn4);
+
         GridPane grid = new GridPane();
         grid.add(btn1, 0, 0);
         grid.add(btn2, 1, 0);
@@ -91,15 +100,15 @@ public class Main extends Application {
         col2.setPercentWidth(100);
 
         //---Actions---
-        btn1.setOnAction(this::actionCheckAnswer);
-        btn2.setOnAction(this::actionCheckAnswer);
-        btn3.setOnAction(this::actionCheckAnswer);
-        btn4.setOnAction(this::actionCheckAnswer);
+        btn1.setOnAction(_ -> actionCheckAnswer("A"));
+        btn2.setOnAction(_ -> actionCheckAnswer("B"));
+        btn3.setOnAction(_ -> actionCheckAnswer("C"));
+        btn4.setOnAction(_ -> actionCheckAnswer("D"));
         //---Actions---
 
         if (!questions.isEmpty()) {
             List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
-            tmp.sort(Comparator.comparing(Question::getConfidence).reversed());
+            tmp.sort(Comparator.comparing(Question::getConfidence));
             upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
             System.out.println(upperQuarterQuestionSeed);
             System.out.println(tmp.get(upperQuarterQuestionSeed).getConfidence());
@@ -156,8 +165,26 @@ public class Main extends Application {
         return navbar;
     }
 
-    private void actionCheckAnswer(Event source) {
-        System.out.println(source);
+    private void actionCheckAnswer(String answer) {
+        if (questions.isEmpty()) return;
+
+        System.out.println(answerButtons);
+        answerButtons.forEach(button -> button.setDisable(true));
+        List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
+        tmp.sort(Comparator.comparing(Question::getConfidence));
+        Question currentQuestion = tmp.get(upperQuarterQuestionSeed);
+        currentQuestion.addLog(new Log(currentQuestion.isCorrect(answer)));
+
+        if (currentQuestion.isCorrect("A")) answerButtons.get(0).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect("B")) answerButtons.get(1).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect("C")) answerButtons.get(2).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect("D")) answerButtons.get(3).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        pause.setOnFinished(_ -> showHome());
+        pause.play();
+
+        System.out.println(currentQuestion.getLogs());
     }
     private void actionAddQuiz() {
         FileChooser fileChooser = new FileChooser();
@@ -222,7 +249,7 @@ public class Main extends Application {
     private void actionResetQuizStats() {
         for (ArrayList<Question> tmp : questions) {
             for (Question question : tmp) {
-                question.getLogs().clear();
+                question.clearLogs();
             }
         }
     }

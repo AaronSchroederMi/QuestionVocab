@@ -30,7 +30,7 @@ public class Question {
     public double getConfidence() {
         double correctAnswerCount = getCorrectAnswerCount();
         double askedCount = getAskedCount();
-        if (askedCount < 5 || correctAnswerCount == 0) {
+        if (correctAnswerCount == 0) {
             return 0;
         }
         return correctAnswerCount / askedCount;
@@ -49,8 +49,8 @@ public class Question {
     public String getQuestion() {
         return question;
     }
-    public String getCorrectAnswer() {
-        return correctAnswer;
+    public boolean isCorrect(String answer) {
+        return answer.equals(correctAnswer);
     }
     public List<Log> getLogs() {
         return logs;
