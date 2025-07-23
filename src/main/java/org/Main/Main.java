@@ -195,7 +195,29 @@ public class Main extends Application {
         }
     }
     private void actionRemoveQuiz() {
+        List<File> currentQuizFiles = new ArrayList<>(quizFiles);
+        if (currentQuizFiles.isEmpty()) return;
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.setStyle("-fx-padding: 8 12 8 12");
 
+        for (File quizFile : currentQuizFiles) {
+            MenuItem quizItem = new MenuItem(quizFile.getName());
+            quizItem.setOnAction(_ -> {
+                int tmp = quizPaths.indexOf(quizFile.toPath());
+                quizPaths.remove(tmp);
+                questions.remove(tmp);
+                quizFiles.remove(quizFile);
+                questionLabel.setText("");
+                showHome();
+            });
+            contextMenu.getItems().add(quizItem);
+        }
+
+        Bounds bounds = root.localToScreen(root.getBoundsInLocal());
+        double centerX = bounds.getMinX() + bounds.getWidth() / 2;
+        double centerY = bounds.getMinY() + bounds.getHeight() / 2;
+
+        contextMenu.show(root, centerX, centerY);
     }
     private void actionResetQuizStats() {
         for (ArrayList<Question> tmp : questions) {
