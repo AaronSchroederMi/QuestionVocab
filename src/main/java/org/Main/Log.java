@@ -17,4 +17,7 @@ public class Log {
     public boolean isCorrect() {
         return correct;
     }
+    public String toString() {
+        return "Time: " + timestamp + ", Correct: " + correct;
+    }
 }

@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main extends Application {
     private Stage primaryStage;
@@ -199,7 +198,11 @@ public class Main extends Application {
 
     }
     private void actionResetQuizStats() {
-
+        for (ArrayList<Question> tmp : questions) {
+            for (Question question : tmp) {
+                question.getLogs().clear();
+            }
+        }
     }
     private void actionAddImageDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
