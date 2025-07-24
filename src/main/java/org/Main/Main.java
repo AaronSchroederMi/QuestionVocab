@@ -70,16 +70,16 @@ public class Main extends Application {
     private GridPane ButtonGrid() {
         Button btn1 = new Button("A");
         btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn1.getStyleClass().add("A");
+        btn1.setStyle("-fx-padding: 20 0 20 0");
         Button btn2 = new Button("B");
         btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn2.getStyleClass().add("B");
+        btn2.setStyle("-fx-padding: 20 0 20 0");
         Button btn3 = new Button("C");
         btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn3.getStyleClass().add("C");
+        btn3.setStyle("-fx-padding: 20 0 20 0");
         Button btn4 = new Button("D");
         btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn4.getStyleClass().add("D");
+        btn4.setStyle("-fx-padding: 20 0 20 0");
 
         answerButtons.clear();
         answerButtons.add(btn1);
@@ -138,8 +138,10 @@ public class Main extends Application {
                 addQuiz,
                 removeQuiz,
                 resetQuizStats,
+                new SeparatorMenuItem(),
                 addImageDirectory,
-                removeImageDirectory);
+                removeImageDirectory
+        );
 
         Button home = new Button("Home");
         Button stats = new Button("Stats");
@@ -307,7 +309,7 @@ public class Main extends Application {
         layout.setAlignment(Pos.CENTER);
 
         view.fitWidthProperty().bind(root.widthProperty());
-        view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty()));
+        view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty().subtract(120)));
 
         root.setCenter(layout);
     }
