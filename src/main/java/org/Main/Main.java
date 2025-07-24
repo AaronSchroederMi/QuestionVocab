@@ -18,9 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -187,6 +185,31 @@ public class Main extends Application {
         pause.setOnFinished(_ -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
         pause.play();
 
+        try {
+            int relevantIndex = questions.size();
+            for (int i = 0; i < questions.size(); i++) {
+                for (Question question : questions.get(i)) {
+                    if (question == currentQuestion) relevantIndex = i;
+                }
+            }
+            if (relevantIndex == questions.size()) throw new IOException();
+
+            String fileToUpdate = quizPaths.get(relevantIndex).toString();
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                            (json, type, context) -> LocalDateTime.parse(json.getAsString()))
+                    .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
+                            (dateTime, type, context) -> new JsonPrimitive(dateTime.format(formatter)))
+                    .setPrettyPrinting()
+                    .create();
+            FileWriter fw = new FileWriter(fileToUpdate);
+            gson.toJson(questions.get(relevantIndex), fw);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         System.out.println(currentQuestion.getLogs());
     }
     private void actionAddQuiz() {
@@ -255,6 +278,7 @@ public class Main extends Application {
                 question.clearLogs();
             }
         }
+        showHome();
     }
     private void actionAddImageDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();

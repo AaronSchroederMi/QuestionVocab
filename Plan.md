@@ -22,8 +22,8 @@
 ...
 ### Choose one of the options (evaluate: Correct | Incorrect)
 - [x] selection buttons are in place
-- [ ] need to evaluate if answer was correct
-- [ ] update log in Json accordingly
+- [x] need to evaluate if answer was correct
+- [x] update log in Json accordingly
 ### Clear loaded `file / files`
 - [x] can remove directory from a menu
 ### Add multiple `question files`
