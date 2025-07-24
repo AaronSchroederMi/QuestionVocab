@@ -45,6 +45,7 @@ public class Main extends Application {
     private final List<File> quizFiles = new ArrayList<>();
     private final List<ArrayList<Question>> questions = new ArrayList<>();
     private int upperQuarterQuestionSeed;
+    private int ranImageIndex;
 
 
     @Override
@@ -181,7 +182,7 @@ public class Main extends Application {
         if (currentQuestion.isCorrect("D")) answerButtons.get(3).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(5));
-        pause.setOnFinished(_ -> showHome());
+        pause.setOnFinished(_ -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
         pause.play();
 
         System.out.println(currentQuestion.getLogs());
@@ -287,13 +288,12 @@ public class Main extends Application {
     private void showHome() {
         GridPane answers = ButtonGrid();
 
-        questionLabel.setAlignment(Pos.CENTER);
+        questionLabel.setStyle("-fx-alignment: center; -fx-font-size: 16px; -fx-font-weight: bold;");
 
         ImageView view = new ImageView();
 
-        int ran = (int) (Math.random() * imageCount);
         if (loadedImages.length != 0) {
-            Image image = new Image(loadedImages[ran].toURI().toString());
+            Image image = new Image(loadedImages[ranImageIndex].toURI().toString());
             view.setImage(image);
         }
 
@@ -302,8 +302,9 @@ public class Main extends Application {
 
         StackPane pane = new StackPane(view);
 
-        VBox layout = new VBox(pane, questionLabel, answers);
+        VBox layout = new VBox(questionLabel, pane, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
+        layout.setAlignment(Pos.CENTER);
 
         view.fitWidthProperty().bind(root.widthProperty());
         view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty()));
