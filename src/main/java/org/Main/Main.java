@@ -167,6 +167,38 @@ public class Main extends Application {
         //--- Action ---
         return navbar;
     }
+    private void writeToJsons(Question currentQuestion) {
+        try {
+            int relevantIndex = questions.size();
+            for (int i = 0; i < questions.size(); i++) {
+                for (Question question : questions.get(i)) {
+                    if (question == currentQuestion) {
+                        relevantIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (relevantIndex == questions.size()) throw new IOException();
+
+            String fileToUpdate = quizPaths.get(relevantIndex).toString();
+            Gson gson = getGsonDateTimeFormatter();
+            FileWriter fw = new FileWriter(fileToUpdate);
+            gson.toJson(questions.get(relevantIndex), fw);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private Gson getGsonDateTimeFormatter() {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        return new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                        (json, _, _) -> LocalDateTime.parse(json.getAsString()))
+                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
+                        (dateTime, _, _) -> new JsonPrimitive(dateTime.format(formatter)))
+                .setPrettyPrinting()
+                .create();
+    }
 
     private void actionCheckAnswer(String answer) {
         if (questions.isEmpty()) return;
@@ -187,30 +219,7 @@ public class Main extends Application {
         pause.setOnFinished(_ -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
         pause.play();
 
-        try {
-            int relevantIndex = questions.size();
-            for (int i = 0; i < questions.size(); i++) {
-                for (Question question : questions.get(i)) {
-                    if (question == currentQuestion) relevantIndex = i;
-                }
-            }
-            if (relevantIndex == questions.size()) throw new IOException();
-
-            String fileToUpdate = quizPaths.get(relevantIndex).toString();
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
-                            (json, type, context) -> LocalDateTime.parse(json.getAsString()))
-                    .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
-                            (dateTime, type, context) -> new JsonPrimitive(dateTime.format(formatter)))
-                    .setPrettyPrinting()
-                    .create();
-            FileWriter fw = new FileWriter(fileToUpdate);
-            gson.toJson(questions.get(relevantIndex), fw);
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeToJsons(currentQuestion);
 
         System.out.println(currentQuestion.getLogs());
     }
@@ -224,14 +233,7 @@ public class Main extends Application {
             quizPaths.add(Path.of(selectedFile.getAbsolutePath()));
             quizFiles.add(selectedFile);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
-                            (json, _, context) -> LocalDateTime.parse(json.getAsString()))
-                    .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
-                            (dateTime, _, context) -> new JsonPrimitive(dateTime.format(formatter)))
-                    .setPrettyPrinting()
-                    .create();
+            Gson gson = getGsonDateTimeFormatter();
 
             Type questionListType = new TypeToken<ArrayList<Question>>() {}.getType();
             questions.clear();
