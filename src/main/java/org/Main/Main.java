@@ -28,7 +28,9 @@ import java.util.*;
 public class Main extends Application {
     private Stage primaryStage;
     private BorderPane root;
-    private final Label loadedInfo = new Label();
+    private String loadedImage = "";
+    private String loadedFiles = "";
+    private final Label loadedInfo = new Label(loadedImage + loadedFiles);
     private final Label questionLabel = new Label();
 
     private final List<Button> navButtons = new ArrayList<>();
@@ -232,6 +234,7 @@ public class Main extends Application {
                     .create();
 
             Type questionListType = new TypeToken<ArrayList<Question>>() {}.getType();
+            questions.clear();
             for (Path path : quizPaths) {
                 FileReader fileReader;
                 try {
@@ -244,6 +247,8 @@ public class Main extends Application {
                 }
                 questions.add(gson.fromJson(fileReader, questionListType));
             }
+            loadedFiles = "loaded Files: " + quizFiles + " (" + questions.stream().flatMap(List::stream).toList().size() + ")";
+            loadedInfo.setText(loadedImage + "; " + loadedFiles);
             showHome();
         }
     }
@@ -261,6 +266,10 @@ public class Main extends Application {
                 questions.remove(tmp);
                 quizFiles.remove(quizFile);
                 questionLabel.setText("");
+
+                loadedFiles = "loaded Quiz: " + quizFiles;
+                if (quizFiles.isEmpty()) loadedFiles = "";
+                loadedInfo.setText(loadedImage + loadedFiles);
                 showHome();
             });
             contextMenu.getItems().add(quizItem);
@@ -297,7 +306,8 @@ public class Main extends Application {
                         )
                         .toArray(File[]::new);
                 imageCount = loadedImages.length;
-                loadedInfo.setText("Loaded " + imageCount + " images, from: " + imageDir.getName());
+                loadedImage = "Loaded " + imageCount + " images, from: " + imageDir.getName();
+                loadedInfo.setText(loadedImage + "; " + loadedFiles);
             }
         }
         showHome();
@@ -307,7 +317,8 @@ public class Main extends Application {
         imageDir = null;
         loadedImages = new File[0];
         imageCount = 0;
-        loadedInfo.setText("");
+        loadedImage = "";
+        loadedInfo.setText(loadedImage + loadedFiles);
         showHome();
     }
 
