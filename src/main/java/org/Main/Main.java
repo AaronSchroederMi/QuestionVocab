@@ -5,10 +5,14 @@ import com.google.gson.reflect.TypeToken;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,12 +21,14 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Main extends Application {
@@ -44,6 +50,8 @@ public class Main extends Application {
     private final List<Path> quizPaths = new ArrayList<>();
     private final List<File> quizFiles = new ArrayList<>();
     private final List<ArrayList<Question>> questions = new ArrayList<>();
+    private List<String> listToDisplay = listToDisplay = quizFiles.stream().map(File::getName).toList();
+    private LineChart<Number, Number> lineChart;
     private int upperQuarterQuestionSeed;
     private int ranImageIndex;
 
@@ -358,8 +366,198 @@ public class Main extends Application {
         root.setCenter(layout);
     }
     private void showStats() {
-        root.setCenter(new TextField("Stats"));
+        if (quizFiles.isEmpty()) {
+            root.setCenter(new Label("No Quiz Files Found"));
+            return;
+        }
+
+        GridPane graphSpace = new GridPane();
+        graphSpace.setAlignment(Pos.CENTER);
+        graphSpace.setHgap(10);
+
+        VBox chartPanel = createChartPanel();
+        VBox pieChart = createProgressPie();
+        VBox listBox = createSelectionBox();
+
+        graphSpace.add(listBox, 0, 0);
+        graphSpace.add(pieChart, 1, 0);
+        graphSpace.add(chartPanel, 0, 1);
+
+        GridPane.setVgrow(listBox, Priority.ALWAYS);
+        GridPane.setHgrow(pieChart, Priority.ALWAYS);
+        GridPane.setHgrow(chartPanel, Priority.ALWAYS);
+
+        root.setCenter(graphSpace);
     }
+
+    private VBox createProgressPie() {
+
+        int doneQuestions = questions.stream()
+                .flatMap(List::stream)
+                .map(Question::getConfidence)
+                .filter(e -> e > 0.8).toList().size();
+        int questionCount = questions.stream().flatMap(List::stream).toList().size();
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                new PieChart.Data("Done", doneQuestions),
+                new PieChart.Data("Todo", questionCount - doneQuestions)
+        );
+        PieChart chart = new PieChart(pieData);
+        chart.setTitle("Done Questions");
+        int tmp = 0;
+        if (questionCount != 0)  tmp = (int) ((double) doneQuestions / questionCount * 100);
+        Label label = new Label("Progress: " + tmp + " %");
+        VBox layout = new VBox(chart, label);
+        layout.setAlignment(Pos.CENTER);
+        return layout;
+    }
+    private VBox createSelectionBox() {
+
+        Label listLabel = new Label("Data Source");
+
+        ToggleGroup group = new ToggleGroup();
+
+        ListView<String> listQuestions = new ListView<>();
+        RadioButton option1 = new RadioButton("Loaded Files");
+        option1.setStyle("-fx-padding: 4");
+        option1.setOnAction(_ -> {
+            listToDisplay = quizFiles.stream().map(File::getName).toList();
+            ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
+            listQuestions.setItems(items);
+        });
+        RadioButton option2 = new RadioButton("Loaded Questions");
+        option2.setStyle("-fx-padding: 4");
+        option2.setOnAction(_ -> {
+            listToDisplay = questions.stream().flatMap(List::stream).map(Question::getQuestion).toList();
+            ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
+            listQuestions.setItems(items);
+        });
+        RadioButton option3 = new RadioButton("Loaded Images");
+        option3.setStyle("-fx-padding: 4");
+        option3.setOnAction(_ -> {
+            listToDisplay = Arrays.stream(loadedImages).map(File::getName).toList();
+            ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
+            listQuestions.setItems(items);
+        });
+
+        option1.setToggleGroup(group);
+        option2.setToggleGroup(group);
+        option3.setToggleGroup(group);
+        group.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                RadioButton selected = (RadioButton) newToggle;
+            }
+        });
+        HBox selectionBox = new HBox(option1, option2, option3);
+        selectionBox.setAlignment(Pos.CENTER);
+        selectionBox.setStyle("-fx-padding: 8 10 8 10");
+
+        VBox listBox = new VBox(listLabel, selectionBox, listQuestions);
+        listBox.setAlignment(Pos.CENTER);
+        return listBox;
+    }
+    private VBox createChartPanel() {
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel("Time");
+
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Value");
+
+        lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Quiz Statistics");
+
+        CheckBox unaskedShare = new CheckBox("Unasked Questions Share");
+        CheckBox doneQuestions = new CheckBox("Done Questions");
+        CheckBox confidence = new CheckBox("Overall Confidence");
+        CheckBox wrongPercentage = new CheckBox("Wrong %");
+        CheckBox rightPercentage = new CheckBox("Right %");
+
+        HBox toggles = new HBox(10, unaskedShare, doneQuestions, confidence, wrongPercentage, rightPercentage);
+        toggles.setAlignment(Pos.CENTER);
+        toggles.setPadding(new Insets(10));
+
+        Button update = new Button("Update Chart");
+        update.setOnAction(e -> {
+            lineChart.getData().clear();
+            if (unaskedShare.isSelected()) lineChart.getData().add(generateData("Unasked Questions (%)"));
+            if (doneQuestions.isSelected()) lineChart.getData().add(generateData("Done Questions (%)"));
+            if (confidence.isSelected()) lineChart.getData().add(generateData("Confidence (%)"));
+            if (wrongPercentage.isSelected()) lineChart.getData().add(generateData("Wrong Answers (%)"));
+            if (rightPercentage.isSelected()) lineChart.getData().add(generateData("Right Answers (%)"));
+        });
+
+        VBox chartBox = new VBox(10, toggles, lineChart, update);
+        chartBox.setPadding(new Insets(10));
+        chartBox.setVgrow(lineChart, Priority.ALWAYS);
+        return chartBox;
+    }
+    private XYChart.Series<Number, Number> generateData(String label) {
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(label);
+
+        // Flatten questions and logs
+        List<Pair<Log, Question>> logsWithQuestions = questions.stream()
+                .flatMap(list -> list.stream())
+                .flatMap(q -> q.getLogs().stream().map(log -> new Pair<>(log, q)))
+                .sorted(Comparator.comparing(p -> p.getKey().getTimestamp()))
+                .toList();
+
+        if (logsWithQuestions.isEmpty()) return series;
+
+        LocalDateTime minTime = logsWithQuestions.get(0).getKey().getTimestamp();
+
+        int totalQuestions = (int) questions.stream().flatMap(List::stream).count();
+        Set<Question> seen = new HashSet<>();
+
+        int done = 0;
+        int correctCount = 0;
+        int wrongCount = 0;
+
+        for (int i = 0; i < logsWithQuestions.size(); i++) {
+            Log log = logsWithQuestions.get(i).getKey();
+            Question question = logsWithQuestions.get(i).getValue();
+
+            done++;
+            if (log.isCorrect()) correctCount++;
+            else wrongCount++;
+
+            long x = ChronoUnit.SECONDS.between(minTime, log.getTimestamp());
+            double y = 0;
+
+            switch (label) {
+                case "Unasked Questions (%)" -> {
+                    seen.add(question);
+                    y = ((double)(totalQuestions - seen.size()) / totalQuestions) * 100;
+                }
+                case "Done Questions (%)" -> {
+                    seen.add(question);
+                    y = ((double)seen.size() / totalQuestions) * 100;
+                }
+                case "Confidence (%)" -> {
+                    y = questions.stream()
+                            .flatMap(List::stream)
+                            .mapToDouble(Question::getConfidence)
+                            .average()
+                            .orElse(0) * 100.0;
+                }
+                case "Wrong Answers (%)" -> {
+                    y = (wrongCount * 100.0) / done;
+                }
+                case "Right Answers (%)" -> {
+                    y = (correctCount * 100.0) / done;
+                }
+                default -> y = 0;
+            }
+
+            series.getData().add(new XYChart.Data<>(x, y));
+            System.out.println("X: " + x + ", Y: " + y + ", Label: " + label);
+        }
+
+        return series;
+    }
+
+
+
     private void showSettings() {
         root.setCenter(new TextField("Settings"));
     }
