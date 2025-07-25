@@ -230,7 +230,9 @@ public class Main extends Application {
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
 
         if (selectedFile != null) {
-            quizPaths.add(Path.of(selectedFile.getAbsolutePath()));
+            Path pathOfSelectedFile = Path.of(selectedFile.getAbsolutePath());
+            if (quizPaths.contains(pathOfSelectedFile)) return;
+            quizPaths.add(pathOfSelectedFile);
             quizFiles.add(selectedFile);
 
             Gson gson = getGsonDateTimeFormatter();
