@@ -300,9 +300,13 @@ public class Main extends Application {
         VBox layout = new VBox(questionLabel, pane, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
         layout.setAlignment(Pos.CENTER);
+        layout.setVisible(false);
 
         view.fitWidthProperty().bind(root.widthProperty());
         view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty().subtract(120)));
+        PauseTransition pause = new PauseTransition(Duration.millis(100));
+        pause.setOnFinished(_ -> layout.setVisible(true));
+        pause.play();
 
         root.setCenter(layout);
     }
