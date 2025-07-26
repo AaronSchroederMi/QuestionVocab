@@ -50,7 +50,7 @@ public class Main extends Application {
     private final List<Path> quizPaths = new ArrayList<>();
     private final List<File> quizFiles = new ArrayList<>();
     private final List<ArrayList<Question>> questions = new ArrayList<>();
-    private List<String> listToDisplay = listToDisplay = quizFiles.stream().map(File::getName).toList();
+    private List<String> listToDisplay = quizFiles.stream().map(File::getName).toList();
     private LineChart<Number, Number> lineChart;
     private int upperQuarterQuestionSeed;
     private int ranImageIndex;
@@ -61,7 +61,7 @@ public class Main extends Application {
         primaryStage = stage;
         root = new BorderPane();
 
-        HBox navbar = navbar();
+        HBox navbar = createNavbar();
         root.setTop(navbar);
 
         showHome();
@@ -75,111 +75,6 @@ public class Main extends Application {
         stage.show();
     }
 
-    private GridPane ButtonGrid() {
-        Button btn1 = new Button("A");
-        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn1.setStyle("-fx-padding: 20 0 20 0");
-        Button btn2 = new Button("B");
-        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn2.setStyle("-fx-padding: 20 0 20 0");
-        Button btn3 = new Button("C");
-        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn3.setStyle("-fx-padding: 20 0 20 0");
-        Button btn4 = new Button("D");
-        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn4.setStyle("-fx-padding: 20 0 20 0");
-
-        answerButtons.clear();
-        answerButtons.add(btn1);
-        answerButtons.add(btn2);
-        answerButtons.add(btn3);
-        answerButtons.add(btn4);
-
-        GridPane grid = new GridPane();
-        grid.add(btn1, 0, 0);
-        grid.add(btn2, 1, 0);
-        grid.add(btn3, 0, 1);
-        grid.add(btn4, 1, 1);
-        grid.setAlignment(Pos.BOTTOM_CENTER);
-        grid.setStyle("-fx-padding: 5;");
-
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPercentWidth(100);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPercentWidth(100);
-
-        //---Actions---
-        btn1.setOnAction(_ -> actionCheckAnswer("A"));
-        btn2.setOnAction(_ -> actionCheckAnswer("B"));
-        btn3.setOnAction(_ -> actionCheckAnswer("C"));
-        btn4.setOnAction(_ -> actionCheckAnswer("D"));
-        //---Actions---
-
-        if (!questions.isEmpty()) {
-            List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
-            tmp.sort(Comparator.comparing(Question::getConfidence));
-            upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
-            System.out.println(upperQuarterQuestionSeed);
-            System.out.println(tmp.get(upperQuarterQuestionSeed).getConfidence());
-
-            btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
-            btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
-            btn3.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("C"));
-            btn4.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("D"));
-
-            questionLabel.setText(tmp.get(upperQuarterQuestionSeed).getQuestion());
-        }
-
-        grid.getColumnConstraints().addAll(col1, col2);
-        return grid;
-    }
-    private HBox navbar() {
-        HBox navbar = new HBox();
-        navbar.getStyleClass().add("navbar");
-
-        MenuItem addQuiz = new MenuItem("Add Quiz");
-        MenuItem removeQuiz = new MenuItem("Remove Quiz");
-        MenuItem resetQuizStats = new MenuItem("Reset Quiz Stats");
-        MenuItem addImageDirectory = new MenuItem("Add Image Directory");
-        MenuItem removeImageDirectory = new MenuItem("Remove Image Directory");
-        MenuButton menuList = new MenuButton("File", null,
-                addQuiz,
-                removeQuiz,
-                resetQuizStats,
-                new SeparatorMenuItem(),
-                addImageDirectory,
-                removeImageDirectory
-        );
-
-        Button home = new Button("Home");
-        Button stats = new Button("Stats");
-        Button settings = new Button("Settings");
-        Button about = new Button("About");
-
-        menuList.setMinWidth(50);
-        home.setMinWidth(50);
-        stats.setMinWidth(40);
-        settings.setMinWidth(60);
-        about.setMinWidth(50);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        navButtons.addAll(List.of(home, stats, settings, about));
-        navbar.getChildren().addAll(menuList, loadedInfo, spacer, home, stats, settings, about);
-
-        //--- Actions ---
-        addQuiz.setOnAction(_ -> actionAddQuiz());
-        removeQuiz.setOnAction(_ -> actionRemoveQuiz());
-        resetQuizStats.setOnAction(_ -> actionResetQuizStats());
-        addImageDirectory.setOnAction(_ -> actionAddImageDirectory());
-        removeImageDirectory.setOnAction(_ -> actionRemoveImageDirectory());
-
-        home.setOnAction(_ -> showHome());
-        stats.setOnAction(_ -> showStats());
-        settings.setOnAction(_ -> showSettings());
-        about.setOnAction(_ -> showAbout());
-        //--- Action ---
-        return navbar;
-    }
     private void writeToJsons(Question currentQuestion) {
         try {
             int relevantIndex = questions.size();
@@ -201,6 +96,64 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private XYChart.Series<Number, Number> generateData(String label) {
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(label);
+
+        // Flatten questions and logs
+        List<Pair<Log, Question>> logsWithQuestions = questions.stream()
+                .flatMap(Collection::stream)
+                .flatMap(q -> q.getLogs().stream().map(log -> new Pair<>(log, q)))
+                .sorted(Comparator.comparing(p -> p.getKey().getTimestamp()))
+                .toList();
+
+        if (logsWithQuestions.isEmpty()) return series;
+
+        LocalDateTime minTime = logsWithQuestions.getFirst().getKey().getTimestamp();
+
+        int totalQuestions = (int) questions.stream().mapToLong(List::size).sum();
+        Set<Question> seen = new HashSet<>();
+
+        int done = 0;
+        int correctCount = 0;
+        int wrongCount = 0;
+
+        for (int i = 0; i < logsWithQuestions.size(); i++) {
+            Log log = logsWithQuestions.get(i).getKey();
+            Question question = logsWithQuestions.get(i).getValue();
+
+            done++;
+            if (log.isCorrect()) correctCount++;
+            else wrongCount++;
+
+            long x = ChronoUnit.SECONDS.between(minTime, log.getTimestamp());
+            double y;
+
+            switch (label) {
+                case "Unasked Questions (%)" -> {
+                    seen.add(question);
+                    y = ((double)(totalQuestions - seen.size()) / totalQuestions) * 100;
+                }
+                case "Done Questions (%)" -> {
+                    seen.add(question);
+                    y = ((double)seen.size() / totalQuestions) * 100;
+                }
+                case "Confidence (%)" -> y = questions.stream()
+                        .flatMap(List::stream)
+                        .mapToDouble(Question::getConfidence)
+                        .average()
+                        .orElse(0) * 100.0;
+                case "Wrong Answers (%)" -> y = (wrongCount * 100.0) / done;
+                case "Right Answers (%)" -> y = (correctCount * 100.0) / done;
+                default -> y = 0;
+            }
+
+            series.getData().add(new XYChart.Data<>(x, y));
+            System.out.println("X: " + x + ", Y: " + y + ", Label: " + label);
+        }
+
+        return series;
     }
     private Gson getGsonDateTimeFormatter() {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -276,19 +229,7 @@ public class Main extends Application {
         contextMenu.setStyle("-fx-padding: 8 12 8 12");
 
         for (File quizFile : currentQuizFiles) {
-            MenuItem quizItem = new MenuItem(quizFile.getName());
-            quizItem.setOnAction(_ -> {
-                int tmp = quizPaths.indexOf(quizFile.toPath());
-                quizPaths.remove(tmp);
-                questions.remove(tmp);
-                quizFiles.remove(quizFile);
-                questionLabel.setText("");
-
-                loadedFiles = "loaded Quiz: " + quizFiles;
-                if (quizFiles.isEmpty()) loadedFiles = "";
-                loadedInfo.setText(loadedImage + loadedFiles);
-                showHome();
-            });
+            MenuItem quizItem = createMenuItem(quizFile);
             contextMenu.getItems().add(quizItem);
         }
 
@@ -340,7 +281,7 @@ public class Main extends Application {
     }
 
     private void showHome() {
-        GridPane answers = ButtonGrid();
+        GridPane answers = createButtonGrid();
 
         questionLabel.setStyle("-fx-alignment: center; -fx-font-size: 16px; -fx-font-weight: bold;");
 
@@ -389,7 +330,134 @@ public class Main extends Application {
 
         root.setCenter(graphSpace);
     }
+    private void showAbout() {
+        root.setCenter(new TextField("ABOUT"));
+    }
+    private void showSettings() {
+        root.setCenter(new TextField("Settings"));
+    }
 
+    private GridPane createButtonGrid() {
+        Button btn1 = new Button("A");
+        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn1.setStyle("-fx-padding: 20 0 20 0");
+        Button btn2 = new Button("B");
+        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn2.setStyle("-fx-padding: 20 0 20 0");
+        Button btn3 = new Button("C");
+        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn3.setStyle("-fx-padding: 20 0 20 0");
+        Button btn4 = new Button("D");
+        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btn4.setStyle("-fx-padding: 20 0 20 0");
+
+        answerButtons.clear();
+        answerButtons.add(btn1);
+        answerButtons.add(btn2);
+        answerButtons.add(btn3);
+        answerButtons.add(btn4);
+
+        GridPane grid = new GridPane();
+        grid.add(btn1, 0, 0);
+        grid.add(btn2, 1, 0);
+        grid.add(btn3, 0, 1);
+        grid.add(btn4, 1, 1);
+        grid.setAlignment(Pos.BOTTOM_CENTER);
+        grid.setStyle("-fx-padding: 5;");
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(100);
+
+        //---Actions---
+        btn1.setOnAction(_ -> actionCheckAnswer("A"));
+        btn2.setOnAction(_ -> actionCheckAnswer("B"));
+        btn3.setOnAction(_ -> actionCheckAnswer("C"));
+        btn4.setOnAction(_ -> actionCheckAnswer("D"));
+        //---Actions---
+
+        if (!questions.isEmpty()) {
+            List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
+            tmp.sort(Comparator.comparing(Question::getConfidence));
+            upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
+            System.out.println(upperQuarterQuestionSeed);
+            System.out.println(tmp.get(upperQuarterQuestionSeed).getConfidence());
+
+            btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
+            btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
+            btn3.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("C"));
+            btn4.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("D"));
+
+            questionLabel.setText(tmp.get(upperQuarterQuestionSeed).getQuestion());
+        }
+
+        grid.getColumnConstraints().addAll(col1, col2);
+        return grid;
+    }
+    private HBox createNavbar() {
+        HBox navbar = new HBox();
+        navbar.getStyleClass().add("createNavbar");
+
+        MenuItem addQuiz = new MenuItem("Add Quiz");
+        MenuItem removeQuiz = new MenuItem("Remove Quiz");
+        MenuItem resetQuizStats = new MenuItem("Reset Quiz Stats");
+        MenuItem addImageDirectory = new MenuItem("Add Image Directory");
+        MenuItem removeImageDirectory = new MenuItem("Remove Image Directory");
+        MenuButton menuList = new MenuButton("File", null,
+                addQuiz,
+                removeQuiz,
+                resetQuizStats,
+                new SeparatorMenuItem(),
+                addImageDirectory,
+                removeImageDirectory
+        );
+
+        Button home = new Button("Home");
+        Button stats = new Button("Stats");
+        Button settings = new Button("Settings");
+        Button about = new Button("About");
+
+        menuList.setMinWidth(50);
+        home.setMinWidth(50);
+        stats.setMinWidth(40);
+        settings.setMinWidth(60);
+        about.setMinWidth(50);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        navButtons.addAll(List.of(home, stats, settings, about));
+        navbar.getChildren().addAll(menuList, loadedInfo, spacer, home, stats, settings, about);
+
+        //--- Actions ---
+        addQuiz.setOnAction(_ -> actionAddQuiz());
+        removeQuiz.setOnAction(_ -> actionRemoveQuiz());
+        resetQuizStats.setOnAction(_ -> actionResetQuizStats());
+        addImageDirectory.setOnAction(_ -> actionAddImageDirectory());
+        removeImageDirectory.setOnAction(_ -> actionRemoveImageDirectory());
+
+        home.setOnAction(_ -> showHome());
+        stats.setOnAction(_ -> showStats());
+        settings.setOnAction(_ -> showSettings());
+        about.setOnAction(_ -> showAbout());
+        //--- Action ---
+        return navbar;
+    }
+    private MenuItem createMenuItem(File quizFile) {
+        MenuItem quizItem = new MenuItem(quizFile.getName());
+        quizItem.setOnAction(_ -> {
+            int tmp = quizPaths.indexOf(quizFile.toPath());
+            quizPaths.remove(tmp);
+            questions.remove(tmp);
+            quizFiles.remove(quizFile);
+            questionLabel.setText("");
+
+            loadedFiles = "loaded Quiz: " + quizFiles;
+            if (quizFiles.isEmpty()) loadedFiles = "";
+            loadedInfo.setText(loadedImage + loadedFiles);
+            showHome();
+        });
+        return quizItem;
+    }
     private VBox createProgressPie() {
 
         int doneQuestions = questions.stream()
@@ -443,11 +511,7 @@ public class Main extends Application {
         option1.setToggleGroup(group);
         option2.setToggleGroup(group);
         option3.setToggleGroup(group);
-        group.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            if (newToggle != null) {
-                RadioButton selected = (RadioButton) newToggle;
-            }
-        });
+
         HBox selectionBox = new HBox(option1, option2, option3);
         selectionBox.setAlignment(Pos.CENTER);
         selectionBox.setStyle("-fx-padding: 8 10 8 10");
@@ -477,7 +541,7 @@ public class Main extends Application {
         toggles.setPadding(new Insets(10));
 
         Button update = new Button("Update Chart");
-        update.setOnAction(e -> {
+        update.setOnAction(_ -> {
             lineChart.getData().clear();
             if (unaskedShare.isSelected()) lineChart.getData().add(generateData("Unasked Questions (%)"));
             if (doneQuestions.isSelected()) lineChart.getData().add(generateData("Done Questions (%)"));
@@ -488,81 +552,8 @@ public class Main extends Application {
 
         VBox chartBox = new VBox(10, toggles, lineChart, update);
         chartBox.setPadding(new Insets(10));
-        chartBox.setVgrow(lineChart, Priority.ALWAYS);
+        VBox.setVgrow(lineChart, Priority.ALWAYS);
         return chartBox;
-    }
-    private XYChart.Series<Number, Number> generateData(String label) {
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName(label);
-
-        // Flatten questions and logs
-        List<Pair<Log, Question>> logsWithQuestions = questions.stream()
-                .flatMap(list -> list.stream())
-                .flatMap(q -> q.getLogs().stream().map(log -> new Pair<>(log, q)))
-                .sorted(Comparator.comparing(p -> p.getKey().getTimestamp()))
-                .toList();
-
-        if (logsWithQuestions.isEmpty()) return series;
-
-        LocalDateTime minTime = logsWithQuestions.get(0).getKey().getTimestamp();
-
-        int totalQuestions = (int) questions.stream().flatMap(List::stream).count();
-        Set<Question> seen = new HashSet<>();
-
-        int done = 0;
-        int correctCount = 0;
-        int wrongCount = 0;
-
-        for (int i = 0; i < logsWithQuestions.size(); i++) {
-            Log log = logsWithQuestions.get(i).getKey();
-            Question question = logsWithQuestions.get(i).getValue();
-
-            done++;
-            if (log.isCorrect()) correctCount++;
-            else wrongCount++;
-
-            long x = ChronoUnit.SECONDS.between(minTime, log.getTimestamp());
-            double y = 0;
-
-            switch (label) {
-                case "Unasked Questions (%)" -> {
-                    seen.add(question);
-                    y = ((double)(totalQuestions - seen.size()) / totalQuestions) * 100;
-                }
-                case "Done Questions (%)" -> {
-                    seen.add(question);
-                    y = ((double)seen.size() / totalQuestions) * 100;
-                }
-                case "Confidence (%)" -> {
-                    y = questions.stream()
-                            .flatMap(List::stream)
-                            .mapToDouble(Question::getConfidence)
-                            .average()
-                            .orElse(0) * 100.0;
-                }
-                case "Wrong Answers (%)" -> {
-                    y = (wrongCount * 100.0) / done;
-                }
-                case "Right Answers (%)" -> {
-                    y = (correctCount * 100.0) / done;
-                }
-                default -> y = 0;
-            }
-
-            series.getData().add(new XYChart.Data<>(x, y));
-            System.out.println("X: " + x + ", Y: " + y + ", Label: " + label);
-        }
-
-        return series;
-    }
-
-
-
-    private void showSettings() {
-        root.setCenter(new TextField("Settings"));
-    }
-    private void showAbout() {
-        root.setCenter(new TextField("ABOUT"));
     }
 
     public static void main(String[] args) {
