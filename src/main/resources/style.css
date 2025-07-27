@@ -1,43 +1,170 @@
+/* === Root / Global === */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #f0f0f0;
+}
+
+/* === Buttons (all contexts) === */
 .button {
-    -fx-background-color: #003566;
-    -fx-text-fill: #ffd60a;
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #555;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
     -fx-font-size: 14px;
-    -fx-padding: 2;
-    -fx-cursor: hand;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
-    -fx-border-color: transparent;
-    -fx-border-width: 2;
 }
 
 .button:hover {
-    -fx-background-color: #003566;
-    -fx-border-color: #ffd60a;
+    -fx-background-color: #505050;
 }
 
-.button.selected {
-    -fx-background-color: #3498db;
+.button:pressed {
+    -fx-background-color: #666666;
+}
+
+.button:disabled {
+    -fx-opacity: 1.0;
+    -fx-text-fill: #aaaaaa;
+    -fx-background-color: #2e2e2e;
+    -fx-border-color: #444444;
+}
+
+/* === Correct / Incorrect Answers === */
+.button.correct {
+    -fx-background-color: #2e7d32; /* Green */
+    -fx-border-color: #66bb6a;
     -fx-text-fill: white;
 }
 
-.navbar {
-    -fx-spacing: 2;
-    -fx-padding: 2;
-    -fx-background-color: #d9d9d9;
+.button.incorrect {
+    -fx-background-color: #c62828; /* Red */
+    -fx-border-color: #ef5350;
+    -fx-text-fill: white;
 }
 
-.A {
-    -fx-background-color: #ef476f;
+/* === ListView and Cells === */
+.list-view {
+    -fx-background-color: #2a2a2a;
+    -fx-border-color: #444444;
+    -fx-text-fill: white;
 }
 
-.B {
-    -fx-background-color: #ffd166;
+.list-cell {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: white;
 }
 
-.C {
-    -fx-background-color: #06d6a0;
+.list-cell:selected {
+    -fx-background-color: #3a3a3a;
 }
 
-.D {
-    -fx-background-color: #118ab2;
+/* Buttons inside list cells */
+.list-cell .button {
+    -fx-background-color: #444444;
+    -fx-text-fill: white;
+    -fx-border-color: #666666;
+}
+
+.list-cell .button:hover {
+    -fx-background-color: #5a5a5a;
+}
+
+/* === Chart Area === */
+.chart,
+.chart-plot-background {
+    -fx-background-color: #2c2c2c;
+}
+
+/* Axis lines and labels */
+.axis {
+    -fx-tick-label-fill: #cccccc;
+    -fx-axis-line-visible: true;
+    -fx-axis-line-color: #999999;
+    -fx-tick-mark-visible: true;
+}
+
+/* Chart legend */
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: white;
+}
+
+.chart-pie-label {
+    -fx-fill: #cccccc;
+    -fx-font-size: 12px;
+}
+
+/* === Tooltip, Menus, Popups === */
+.context-menu,
+.menu-button,
+.menu,
+.tooltip {
+    -fx-background-color: #2c2c2c;
+    -fx-border-color: #444444;
+    -fx-text-fill: white;
+}
+
+.menu-item {
+    -fx-text-fill: white;
+}
+
+.menu-item:focused {
+    -fx-background-color: #444444;
+}
+
+/* === Force white text for all labels === */
+.label {
+    -fx-text-fill: white;
+}
+
+/* === Navbar and its buttons === */
+.createNavbar {
+    -fx-background-color: #2a2a2a;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
+}
+
+.createNavbar .button,
+.createNavbar .menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.createNavbar .button:hover,
+.createNavbar .menu-button:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+/* === RadioButtons, CheckBoxes, ToggleButtons === */
+.radio-button,
+.check-box,
+.toggle-button {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+}
+
+.radio-button:selected,
+.check-box:selected,
+.toggle-button:selected {
+    -fx-background-color: #3a3a3a;
+}
+
+.radio-button .radio,
+.check-box .box {
+    -fx-border-color: #888888;
+    -fx-background-color: #444444;
+}
+
+.radio-button:hover,
+.check-box:hover,
+.toggle-button:hover {
+    -fx-background-color: #505050;
+    -fx-text-fill: white;
 }

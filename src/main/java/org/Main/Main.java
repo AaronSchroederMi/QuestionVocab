@@ -299,6 +299,7 @@ public class Main extends Application {
 
         VBox layout = new VBox(questionLabel, pane, answers);
         VBox.setVgrow(pane, Priority.ALWAYS);
+        layout.setPadding(new Insets(10, 0, 0, 0));
         layout.setAlignment(Pos.CENTER);
         layout.setVisible(false);
 
