@@ -17,6 +17,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -340,8 +344,55 @@ public class Main extends Application {
         root.setCenter(graphSpace);
     }
     private void showAbout() {
-        root.setCenter(new Label("ABOUT"));
+        VBox aboutContent = new VBox(15);
+        aboutContent.setAlignment(Pos.CENTER);
+        aboutContent.setPadding(new Insets(40));
+
+        Label title = new Label("A Vocab Quiz Application");
+
+        Label version = new Label("Version 1.0.0");
+
+        Label author = new Label("Developed by Aaron Schröder");
+
+        Label description = getLabel();
+
+        Label context = new Label(
+                "This was built in roughly a week as a break from university work, which mostly involves Java AWT and Swing for GUIs. " +
+                        "To be kind, those are quaint but outdated. " +
+                        "The real goal here was to experiment with JavaFX, and for that purpose, even with an on-and-off approach, the app is doing just fine."
+        );
+        context.setWrapText(true);
+        context.setMaxWidth(400);
+
+        Label jsonStruktur = new Label();
+
+        Hyperlink link = new Hyperlink("https://test");
+        link.setOnAction(e -> {
+            try {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI(link.getText()));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        aboutContent.getChildren().addAll(title, version, author, description, context, jsonStruktur, link);
+
+        root.setCenter(aboutContent);
     }
+
+    private Label getLabel() {
+        Label description = new Label(
+                "This application is built with JavaFX. " +
+                        "It aims to provide an easy way to load vocab-style learning material. " +
+                        "The material is loaded from JSON files. (Example in Plan.md) " +
+                        "Questions are presented in an order that adapts to the user's performance per question. " +
+                        "Images can also be loaded to help maintain user engagement (not necessarily related to the questions)."
+        );
+        description.setWrapText(true);
+        description.setMaxWidth(400);
+        return description;
+    }
+
     private void showSettings() {
         root.setCenter(new Label("Settings"));
     }
