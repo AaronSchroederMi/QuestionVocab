@@ -224,7 +224,6 @@ public class Main extends Application {
             showHome();
         }
     }
-
     private void actionRemoveQuiz() {
         List<File> currentQuizFiles = new ArrayList<>(quizFiles);
         if (currentQuizFiles.isEmpty()) return;
@@ -426,11 +425,11 @@ public class Main extends Application {
         Button settings = new Button("Settings");
         Button about = new Button("About");
 
-        menuList.setMinWidth(50);
-        home.setMinWidth(50);
-        stats.setMinWidth(40);
-        settings.setMinWidth(60);
-        about.setMinWidth(50);
+        menuList.setMinWidth(55);
+        home.setMinWidth(65);
+        stats.setMinWidth(55);
+        settings.setMinWidth(75);
+        about.setMinWidth(65);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         navButtons.addAll(List.of(home, stats, settings, about));
