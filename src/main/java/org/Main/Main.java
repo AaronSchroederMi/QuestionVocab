@@ -17,14 +17,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
@@ -374,7 +369,7 @@ public class Main extends Application {
 
         Label jsonStruktur = new Label();
 
-        Hyperlink link = new Hyperlink("https://test");
+        Hyperlink link = new Hyperlink("https://github.com/AaronSchroederMi/QuestionVocab");
         link.setOnAction(e -> {
             try {
                 java.awt.Desktop.getDesktop().browse(new java.net.URI(link.getText()));

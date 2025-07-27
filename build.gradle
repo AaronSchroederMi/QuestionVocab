@@ -2,10 +2,11 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.beryx.jlink' version '2.25.0'
 }
 
 group = 'org.Main'
-version = '1.0-SNAPSHOT'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -13,19 +14,41 @@ repositories {
 
 javafx {
     version = "24.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation 'org.openjfx:javafx-controls:24.0.2'
-    implementation 'org.openjfx:javafx-fxml:24.0.2'
-    implementation 'com.google.code.gson:gson:2.13.1'
+    modules = ['javafx.controls', 'javafx.fxml']
 }
 
 application {
+    mainModule = 'QuestionVocab'
     mainClass = 'org.Main.Main'
+}
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    imageName = 'QuestionQuiz'
+    launcher {
+        name = 'QuestionQuiz'
+    }
+
+    jpackage {
+        installerType = 'msi'
+        installerName = 'QuestionQuiz'
+        icon = 'src/main/resources/icon.ico'
+        installerOptions = [
+                '--win-menu',
+                '--win-shortcut',
+                '--win-menu-group', 'QuestionQuiz',
+                '--win-dir-chooser'
+        ]
+    }
+}
+
+dependencies {
+    implementation 'org.openjfx:javafx-controls:24.0.2'
+    implementation 'org.openjfx:javafx-fxml:24.0.2'
+    implementation 'com.google.code.gson:gson:2.13.1'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
