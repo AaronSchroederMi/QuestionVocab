@@ -165,9 +165,9 @@ public class Main extends Application {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         return new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
-                        (json, _, _) -> LocalDateTime.parse(json.getAsString()))
+                        (json, unused1, unused2) -> LocalDateTime.parse(json.getAsString()))
                 .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>)
-                        (dateTime, _, _) -> new JsonPrimitive(dateTime.format(formatter)))
+                        (dateTime, unused1, unused2) -> new JsonPrimitive(dateTime.format(formatter)))
                 .setPrettyPrinting()
                 .create();
     }
@@ -188,7 +188,7 @@ public class Main extends Application {
         if (currentQuestion.isCorrect("D")) answerButtons.get(3).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(5));
-        pause.setOnFinished(_ -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
+        pause.setOnFinished(unused1 -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
         pause.play();
 
         writeToJsons(currentQuestion);
@@ -314,7 +314,7 @@ public class Main extends Application {
         view.fitWidthProperty().bind(root.widthProperty());
         view.fitHeightProperty().bind(pane.heightProperty().subtract(answers.heightProperty().subtract(120)));
         PauseTransition pause = new PauseTransition(Duration.millis(100));
-        pause.setOnFinished(_ -> layout.setVisible(true));
+        pause.setOnFinished(unused1 -> layout.setVisible(true));
         pause.play();
 
         root.setCenter(layout);
@@ -425,10 +425,10 @@ public class Main extends Application {
         col2.setPercentWidth(100);
 
         //---Actions---
-        btn1.setOnAction(_ -> actionCheckAnswer("A"));
-        btn2.setOnAction(_ -> actionCheckAnswer("B"));
-        btn3.setOnAction(_ -> actionCheckAnswer("C"));
-        btn4.setOnAction(_ -> actionCheckAnswer("D"));
+        btn1.setOnAction(unused1 -> actionCheckAnswer("A"));
+        btn2.setOnAction(unused1 -> actionCheckAnswer("B"));
+        btn3.setOnAction(unused1 -> actionCheckAnswer("C"));
+        btn4.setOnAction(unused1 -> actionCheckAnswer("D"));
         //---Actions---
 
         if (!questions.isEmpty()) {
@@ -483,22 +483,22 @@ public class Main extends Application {
         navbar.getChildren().addAll(menuList, loadedInfo, spacer, home, stats, settings, about);
 
         //--- Actions ---
-        addQuiz.setOnAction(_ -> actionAddQuiz());
-        removeQuiz.setOnAction(_ -> actionRemoveQuiz());
-        resetQuizStats.setOnAction(_ -> actionResetQuizStats());
-        addImageDirectory.setOnAction(_ -> actionAddImageDirectory());
-        removeImageDirectory.setOnAction(_ -> actionRemoveImageDirectory());
+        addQuiz.setOnAction(unused1 -> actionAddQuiz());
+        removeQuiz.setOnAction(unused1 -> actionRemoveQuiz());
+        resetQuizStats.setOnAction(unused1 -> actionResetQuizStats());
+        addImageDirectory.setOnAction(unused1 -> actionAddImageDirectory());
+        removeImageDirectory.setOnAction(unused1 -> actionRemoveImageDirectory());
 
-        home.setOnAction(_ -> showHome());
-        stats.setOnAction(_ -> showStats());
-        settings.setOnAction(_ -> showSettings());
-        about.setOnAction(_ -> showAbout());
+        home.setOnAction(unused1 -> showHome());
+        stats.setOnAction(unused1 -> showStats());
+        settings.setOnAction(unused1 -> showSettings());
+        about.setOnAction(unused1 -> showAbout());
         //--- Action ---
         return navbar;
     }
     private MenuItem createMenuItem(File quizFile) {
         MenuItem quizItem = new MenuItem(quizFile.getName());
-        quizItem.setOnAction(_ -> {
+        quizItem.setOnAction(unused1 -> {
             int tmp = quizPaths.indexOf(quizFile.toPath());
             quizPaths.remove(tmp);
             questions.remove(tmp);
@@ -543,21 +543,21 @@ public class Main extends Application {
         ListView<String> listQuestions = new ListView<>();
         RadioButton option1 = new RadioButton("Loaded Files");
         option1.setStyle("-fx-padding: 4");
-        option1.setOnAction(_ -> {
+        option1.setOnAction(unused1 -> {
             listToDisplay = quizFiles.stream().map(File::getName).toList();
             ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
             listQuestions.setItems(items);
         });
         RadioButton option2 = new RadioButton("Loaded Questions");
         option2.setStyle("-fx-padding: 4");
-        option2.setOnAction(_ -> {
+        option2.setOnAction(unused1 -> {
             listToDisplay = questions.stream().flatMap(List::stream).map(Question::getQuestion).toList();
             ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
             listQuestions.setItems(items);
         });
         RadioButton option3 = new RadioButton("Loaded Images");
         option3.setStyle("-fx-padding: 4");
-        option3.setOnAction(_ -> {
+        option3.setOnAction(unused1 -> {
             listToDisplay = Arrays.stream(loadedImages).map(File::getName).toList();
             ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
             listQuestions.setItems(items);
@@ -597,7 +597,7 @@ public class Main extends Application {
         toggles.setPadding(new Insets(10));
 
         Button update = new Button("Update Chart");
-        update.setOnAction(_ -> {
+        update.setOnAction(unused1 -> {
             lineChart.getData().clear();
             if (unaskedShare.isSelected()) lineChart.getData().add(generateData("Unasked Questions (%)"));
             if (doneQuestions.isSelected()) lineChart.getData().add(generateData("Done Questions (%)"));
