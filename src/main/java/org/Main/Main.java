@@ -50,7 +50,7 @@ public class Main extends Application {
     private final List<Path> quizPaths = new ArrayList<>();
     private final List<File> quizFiles = new ArrayList<>();
     private final List<ArrayList<Question>> questions = new ArrayList<>();
-    private List<String> listToDisplay = quizFiles.stream().map(File::getName).toList();
+    private List<String> listToDisplay = new ArrayList<>();
     private LineChart<Number, Number> lineChart;
     private int upperQuarterQuestionSeed;
     private int ranImageIndex;
@@ -191,37 +191,40 @@ public class Main extends Application {
     }
     private void actionAddQuiz() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open a Quiz (JSON)");
+        fileChooser.setTitle("Open Quiz Files (JSON)");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
 
-        if (selectedFile != null) {
-            Path pathOfSelectedFile = Path.of(selectedFile.getAbsolutePath());
-            if (quizPaths.contains(pathOfSelectedFile)) return;
-            quizPaths.add(pathOfSelectedFile);
-            quizFiles.add(selectedFile);
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(primaryStage);
 
+        if (selectedFiles != null && !selectedFiles.isEmpty()) {
             Gson gson = getGsonDateTimeFormatter();
-
             Type questionListType = new TypeToken<ArrayList<Question>>() {}.getType();
-            questions.clear();
-            for (Path path : quizPaths) {
-                FileReader fileReader;
-                try {
-                    fileReader = new FileReader(String.valueOf(path));
+
+            for (File selectedFile : selectedFiles) {
+                Path pathOfSelectedFile = selectedFile.toPath();
+                if (quizPaths.contains(pathOfSelectedFile)) continue;
+
+                try (FileReader fileReader = new FileReader(selectedFile)) {
+                    quizPaths.add(pathOfSelectedFile);
+                    quizFiles.add(selectedFile);
+
+                    List<Question> loadedQuestions = gson.fromJson(fileReader, questionListType);
+                    questions.add((ArrayList<Question>) loadedQuestions);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    quizPaths.remove(path);
-                    quizFiles.remove(path.toFile());
-                    break;
+                    quizPaths.remove(pathOfSelectedFile);
+                    quizFiles.remove(selectedFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                questions.add(gson.fromJson(fileReader, questionListType));
             }
-            loadedFiles = "loaded Files: " + quizFiles + " (" + questions.stream().flatMap(List::stream).toList().size() + ")";
+
+            loadedFiles = "loaded Files: " + quizFiles + " (" + questions.stream().mapToLong(List::size).sum() + ")";
             loadedInfo.setText(loadedImage + "; " + loadedFiles);
             showHome();
         }
     }
+
     private void actionRemoveQuiz() {
         List<File> currentQuizFiles = new ArrayList<>(quizFiles);
         if (currentQuizFiles.isEmpty()) return;
@@ -336,10 +339,10 @@ public class Main extends Application {
         root.setCenter(graphSpace);
     }
     private void showAbout() {
-        root.setCenter(new TextField("ABOUT"));
+        root.setCenter(new Label("ABOUT"));
     }
     private void showSettings() {
-        root.setCenter(new TextField("Settings"));
+        root.setCenter(new Label("Settings"));
     }
 
     private GridPane createButtonGrid() {
