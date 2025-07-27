@@ -151,7 +151,6 @@ public class Main extends Application {
             }
 
             series.getData().add(new XYChart.Data<>(x, y));
-            System.out.println("X: " + x + ", Y: " + y + ", Label: " + label);
         }
 
         return series;
@@ -170,7 +169,6 @@ public class Main extends Application {
     private void actionCheckAnswer(String answer) {
         if (questions.isEmpty()) return;
 
-        System.out.println(answerButtons);
         answerButtons.forEach(button -> button.setDisable(true));
         List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
         tmp.sort(Comparator.comparing(Question::getConfidence));
@@ -187,8 +185,6 @@ public class Main extends Application {
         pause.play();
 
         writeToJsons(currentQuestion);
-
-        System.out.println(currentQuestion.getLogs());
     }
     private void actionAddQuiz() {
         FileChooser fileChooser = new FileChooser();
@@ -430,8 +426,6 @@ public class Main extends Application {
             List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
             tmp.sort(Comparator.comparing(Question::getConfidence));
             upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
-            System.out.println(upperQuarterQuestionSeed);
-            System.out.println(tmp.get(upperQuarterQuestionSeed).getConfidence());
 
             btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
             btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
