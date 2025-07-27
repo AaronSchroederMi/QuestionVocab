@@ -329,9 +329,9 @@ public class Main extends Application {
 
         graphSpace.add(listBox, 0, 0);
         graphSpace.add(pieChart, 1, 0);
-        graphSpace.add(chartPanel, 0, 1);
+        graphSpace.add(chartPanel, 0, 1, 2, 1);
 
-        GridPane.setVgrow(listBox, Priority.ALWAYS);
+        GridPane.setHgrow(listBox, Priority.ALWAYS);
         GridPane.setHgrow(pieChart, Priority.ALWAYS);
         GridPane.setHgrow(chartPanel, Priority.ALWAYS);
 
@@ -489,6 +489,7 @@ public class Main extends Application {
     private VBox createSelectionBox() {
 
         Label listLabel = new Label("Data Source");
+        listLabel.setStyle("-fx-font-weight: bold; -fx-padding: 7;");
 
         ToggleGroup group = new ToggleGroup();
 
@@ -523,7 +524,8 @@ public class Main extends Application {
         selectionBox.setAlignment(Pos.CENTER);
         selectionBox.setStyle("-fx-padding: 8 10 8 10");
 
-        VBox listBox = new VBox(listLabel, selectionBox, listQuestions);
+        //VBox listBox = new VBox(listLabel, selectionBox, listQuestions);
+        VBox listBox = new VBox(listLabel, listQuestions, selectionBox);
         listBox.setAlignment(Pos.CENTER);
         return listBox;
     }
@@ -532,7 +534,7 @@ public class Main extends Application {
         xAxis.setLabel("Time");
 
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Value");
+        yAxis.setLabel("Percentage");
 
         lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Quiz Statistics");
