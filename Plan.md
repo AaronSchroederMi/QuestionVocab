@@ -10,16 +10,16 @@
 - [x] displays the amount of loaded images
 - [x] displays what directory is currently loaded
 ### Show loaded questions (Numeric)
-- [ ] displays the amount of loaded questions
-- [ ] displays what files are currently loaded
+- [x] displays the amount of loaded questions
+- [x] displays what files are currently loaded
 ### Show the most suitable question to user
 - [x] chooses a random question from the upper quarter of the `questionList` (sorted by confidence)
 ### Reset `file` stats
 - [ ] clear logs of a file
 - [ ] clear logs of a question
-- [ ] clear logs of all loaded files
+- [x] clear logs of all loaded files
 ### Show progress on a `file / files`, separate page
-...
+stats page
 ### Choose one of the options (evaluate: Correct | Incorrect)
 - [x] selection buttons are in place
 - [x] need to evaluate if answer was correct
@@ -59,13 +59,12 @@ Bsp.:
 ]
 ```
 ## 3. How should stats be shown?
-### Asked vs. Unasked ratio (Pie-Chart)
-#### Correctly vs. Incorrectly ratio (Pie-Chart)
-### Overall eval on Progress (Percentage)
-### Progress over Time (Bar-Chart and Trendlinie)
-### Time Spend on File (Duration)
-### List questions, with confidence value, progress
+- [x] Done vs. not done questions (Pie-Chart)
+- [x] Overall eval on Progress (Percentage)
+  - needs some work does not go to 100 %
+- [x] Progress over Time (Bar-Chart and Trendlinie)
+- [ ] Time Spend on File (Duration)
+- [ ] List questions, with confidence value, progress
 ## 4. Technology to use?
 ### JavaFX SDK
 ### jpackage
-### Install4j
