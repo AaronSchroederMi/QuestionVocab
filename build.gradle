@@ -12,8 +12,14 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 javafx {
-    version = "24.0.2"
+    version = "21.0.2"
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -30,21 +36,21 @@ jlink {
     }
 
     jpackage {
-        installerType = 'msi'
+        installerType = 'deb'
         installerName = 'QuestionQuiz'
-        icon = 'src/main/resources/icon.ico'
+        appVersion = '1.0.0'
+        icon = 'src/main/resources/icon.png'
         installerOptions = [
-                '--win-menu',
-                '--win-shortcut',
-                '--win-menu-group', 'QuestionQuiz',
-                '--win-dir-chooser'
+                '--linux-shortcut',
+                '--linux-menu-group', 'QuestionQuiz',
+                '--linux-deb-maintainer', 'Aaron Schröder'
         ]
     }
 }
 
 dependencies {
-    implementation 'org.openjfx:javafx-controls:24.0.2'
-    implementation 'org.openjfx:javafx-fxml:24.0.2'
+    implementation 'org.openjfx:javafx-controls:21.0.2'
+    implementation 'org.openjfx:javafx-fxml:21.0.2'
     implementation 'com.google.code.gson:gson:2.13.1'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
