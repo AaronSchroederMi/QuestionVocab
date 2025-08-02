@@ -68,3 +68,15 @@ Bsp.:
 ## 4. Technology to use?
 ### JavaFX SDK
 ### jpackage
+
+# Update (TODO)
+- [ ] make questions choosing exclude done questions
+- [ ] Popup when question is answered
+  - [ ] display confidence value
+  - [ ] green or red, depending on the change
+- [ ] disable time spacing on the line chart
+  - [ ] rename or remove Done questions (asked questions)
+- [ ] add tooltips
+- [ ] display confidence behind list of File
+- [ ] display confidence behind list of Questions
+- [ ] defat main

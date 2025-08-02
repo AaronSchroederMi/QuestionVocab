@@ -138,7 +138,7 @@ public class Main extends Application {
                 }
                 case "Done Questions (%)" -> {
                     seen.add(question);
-                    y = ((double)seen.size() / totalQuestions) * 100;
+                    y = ((double) seen.size() / totalQuestions) * 100;
                 }
                 case "Confidence (%)" -> y = questions.stream()
                         .flatMap(List::stream)
