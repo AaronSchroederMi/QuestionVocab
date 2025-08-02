@@ -170,9 +170,21 @@ public class Main extends Application {
         if (questions.isEmpty()) return;
 
         answerButtons.forEach(button -> button.setDisable(true));
-        List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
+        List<Question> tmp = new ArrayList<>(
+                questions.stream()
+                        .flatMap(List::stream)
+                        .filter(e -> e.getConfidence() < 0.8)
+                        .toList()
+        );
+        System.out.println(questions.stream()
+                        .flatMap(List::stream)
+                        .filter(e -> e.getConfidence() < 0.8)
+                        .map(Question::getQuestion)
+                        .toList()
+        );
         tmp.sort(Comparator.comparing(Question::getConfidence));
         Question currentQuestion = tmp.get(upperQuarterQuestionSeed);
+        System.out.println(currentQuestion.getConfidence());
         currentQuestion.addLog(new Log(currentQuestion.isCorrect(answer)));
 
         if (currentQuestion.isCorrect("A")) answerButtons.get(0).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
@@ -423,16 +435,28 @@ public class Main extends Application {
         //---Actions---
 
         if (!questions.isEmpty()) {
-            List<Question> tmp = new ArrayList<>(questions.stream().flatMap(List::stream).toList());
-            tmp.sort(Comparator.comparing(Question::getConfidence));
-            upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
+            List<Question> tmp = new ArrayList<>(
+                    questions.stream()
+                            .flatMap(List::stream)
+                            .filter(e -> e.getConfidence() < 0.8)
+                            .toList()
+            );
+            if (!tmp.isEmpty()) {
+                tmp.sort(Comparator.comparing(Question::getConfidence));
+                upperQuarterQuestionSeed = (int) (Math.random() * (tmp.size() * 0.25));
 
-            btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
-            btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
-            btn3.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("C"));
-            btn4.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("D"));
+                btn1.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("A"));
+                btn2.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("B"));
+                btn3.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("C"));
+                btn4.setText(tmp.get(upperQuarterQuestionSeed).getAnswers().get("D"));
 
-            questionLabel.setText(tmp.get(upperQuarterQuestionSeed).getQuestion());
+                questionLabel.setText(tmp.get(upperQuarterQuestionSeed).getQuestion());
+            } else {
+                btn1.setText("Done");
+                btn2.setText("Done");
+                btn3.setText("Done");
+                btn4.setText("Done");
+            }
         }
 
         grid.getColumnConstraints().addAll(col1, col2);
@@ -506,7 +530,7 @@ public class Main extends Application {
         int doneQuestions = questions.stream()
                 .flatMap(List::stream)
                 .map(Question::getConfidence)
-                .filter(e -> e > 0.8).toList().size();
+                .filter(e -> e >= 0.8).toList().size();
         int questionCount = questions.stream().flatMap(List::stream).toList().size();
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(

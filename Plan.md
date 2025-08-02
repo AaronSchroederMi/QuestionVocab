@@ -70,7 +70,7 @@ Bsp.:
 ### jpackage
 
 # Update (TODO)
-- [ ] make questions choosing exclude done questions
+- [x] make questions choosing exclude done questions
 - [ ] Popup when question is answered
   - [ ] display confidence value
   - [ ] green or red, depending on the change
