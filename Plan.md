@@ -71,6 +71,7 @@ Bsp.:
 
 # Update (TODO)
 - [x] make questions choosing exclude done questions
+- [x] randomise order of answer buttons
 - [ ] Popup when question is answered
   - [ ] display confidence value
   - [ ] green or red, depending on the change

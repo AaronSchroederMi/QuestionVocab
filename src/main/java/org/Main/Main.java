@@ -176,21 +176,14 @@ public class Main extends Application {
                         .filter(e -> e.getConfidence() < 0.8)
                         .toList()
         );
-        System.out.println(questions.stream()
-                        .flatMap(List::stream)
-                        .filter(e -> e.getConfidence() < 0.8)
-                        .map(Question::getQuestion)
-                        .toList()
-        );
         tmp.sort(Comparator.comparing(Question::getConfidence));
         Question currentQuestion = tmp.get(upperQuarterQuestionSeed);
-        System.out.println(currentQuestion.getConfidence());
         currentQuestion.addLog(new Log(currentQuestion.isCorrect(answer)));
 
-        if (currentQuestion.isCorrect("A")) answerButtons.get(0).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
-        if (currentQuestion.isCorrect("B")) answerButtons.get(1).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
-        if (currentQuestion.isCorrect("C")) answerButtons.get(2).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
-        if (currentQuestion.isCorrect("D")) answerButtons.get(3).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect(answerButtons.get(0).getId())) answerButtons.get(0).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect(answerButtons.get(1).getId())) answerButtons.get(1).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect(answerButtons.get(2).getId())) answerButtons.get(2).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
+        if (currentQuestion.isCorrect(answerButtons.get(3).getId())) answerButtons.get(3).setStyle("-fx-background-color: lightGreen; -fx-border-color: green;");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(5));
         pause.setOnFinished(unused1 -> {ranImageIndex = (int) (Math.random() * imageCount); showHome();});
@@ -398,15 +391,19 @@ public class Main extends Application {
         Button btn1 = new Button("A");
         btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn1.setStyle("-fx-padding: 20 0 20 0");
+        btn1.setId("A");
         Button btn2 = new Button("B");
         btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn2.setStyle("-fx-padding: 20 0 20 0");
+        btn2.setId("B");
         Button btn3 = new Button("C");
         btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn3.setStyle("-fx-padding: 20 0 20 0");
+        btn3.setId("C");
         Button btn4 = new Button("D");
         btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btn4.setStyle("-fx-padding: 20 0 20 0");
+        btn4.setId("D");
 
         answerButtons.clear();
         answerButtons.add(btn1);
@@ -415,10 +412,12 @@ public class Main extends Application {
         answerButtons.add(btn4);
 
         GridPane grid = new GridPane();
-        grid.add(btn1, 0, 0);
-        grid.add(btn2, 1, 0);
-        grid.add(btn3, 0, 1);
-        grid.add(btn4, 1, 1);
+        Collections.shuffle(answerButtons);
+
+        grid.add(answerButtons.get(0), 0, 0);
+        grid.add(answerButtons.get(1), 1, 0);
+        grid.add(answerButtons.get(2), 0, 1);
+        grid.add(answerButtons.get(3), 1, 1);
         grid.setAlignment(Pos.BOTTOM_CENTER);
         grid.setStyle("-fx-padding: 5;");
 
