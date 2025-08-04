@@ -98,7 +98,7 @@ public class Main extends Application {
             e.printStackTrace();
         }
     }
-    private XYChart.Series<Number, Number> generateData(String label) {
+    private XYChart.Series<Number, Number> generateData(String label, boolean useTime) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(label);
 
@@ -119,6 +119,7 @@ public class Main extends Application {
         int done = 0;
         int correctCount = 0;
         int wrongCount = 0;
+        long x = 0;
 
         for (int i = 0; i < logsWithQuestions.size(); i++) {
             Log log = logsWithQuestions.get(i).getKey();
@@ -128,7 +129,7 @@ public class Main extends Application {
             if (log.isCorrect()) correctCount++;
             else wrongCount++;
 
-            long x = ChronoUnit.SECONDS.between(minTime, log.getTimestamp());
+            if (useTime) x = ChronoUnit.MINUTES.between(minTime, log.getTimestamp());
             double y;
 
             switch (label) {
@@ -136,7 +137,7 @@ public class Main extends Application {
                     seen.add(question);
                     y = ((double)(totalQuestions - seen.size()) / totalQuestions) * 100;
                 }
-                case "Done Questions (%)" -> {
+                case "Asked Questions (%)" -> {
                     seen.add(question);
                     y = ((double) seen.size() / totalQuestions) * 100;
                 }
@@ -151,6 +152,7 @@ public class Main extends Application {
             }
 
             series.getData().add(new XYChart.Data<>(x, y));
+            x++;
         }
 
         return series;
@@ -590,7 +592,7 @@ public class Main extends Application {
     }
     private VBox createChartPanel() {
         NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel("Time");
+        xAxis.setLabel("Minutes or Log Count");
 
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Percentage");
@@ -599,7 +601,7 @@ public class Main extends Application {
         lineChart.setTitle("Quiz Statistics");
 
         CheckBox unaskedShare = new CheckBox("Unasked Questions Share");
-        CheckBox doneQuestions = new CheckBox("Done Questions");
+        CheckBox doneQuestions = new CheckBox("Asked Questions");
         CheckBox confidence = new CheckBox("Overall Confidence");
         CheckBox wrongPercentage = new CheckBox("Wrong %");
         CheckBox rightPercentage = new CheckBox("Right %");
@@ -609,16 +611,18 @@ public class Main extends Application {
         toggles.setPadding(new Insets(10));
 
         Button update = new Button("Update Chart");
+        CheckBox useTime = new CheckBox("Use Time");
         update.setOnAction(unused1 -> {
             lineChart.getData().clear();
-            if (unaskedShare.isSelected()) lineChart.getData().add(generateData("Unasked Questions (%)"));
-            if (doneQuestions.isSelected()) lineChart.getData().add(generateData("Done Questions (%)"));
-            if (confidence.isSelected()) lineChart.getData().add(generateData("Confidence (%)"));
-            if (wrongPercentage.isSelected()) lineChart.getData().add(generateData("Wrong Answers (%)"));
-            if (rightPercentage.isSelected()) lineChart.getData().add(generateData("Right Answers (%)"));
+            if (unaskedShare.isSelected()) lineChart.getData().add(generateData("Unasked Questions (%)", useTime.isSelected()));
+            if (doneQuestions.isSelected()) lineChart.getData().add(generateData("Asked Questions (%)", useTime.isSelected()));
+            if (confidence.isSelected()) lineChart.getData().add(generateData("Confidence (%)", useTime.isSelected()));
+            if (wrongPercentage.isSelected()) lineChart.getData().add(generateData("Wrong Answers (%)", useTime.isSelected()));
+            if (rightPercentage.isSelected()) lineChart.getData().add(generateData("Right Answers (%)", useTime.isSelected()));
         });
+        HBox updateBox = new HBox(10, update, useTime);
 
-        VBox chartBox = new VBox(10, toggles, lineChart, update);
+        VBox chartBox = new VBox(10, toggles, lineChart, updateBox);
         chartBox.setPadding(new Insets(10));
         VBox.setVgrow(lineChart, Priority.ALWAYS);
         return chartBox;

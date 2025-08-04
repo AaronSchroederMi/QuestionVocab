@@ -75,8 +75,8 @@ Bsp.:
 - [ ] Popup when question is answered
   - [ ] display confidence value
   - [ ] green or red, depending on the change
-- [ ] disable time spacing on the line chart
-  - [ ] rename or remove Done questions (asked questions)
+- [x] disable time spacing on the line chart
+  - [x] disable time spacing on the line chart
 - [ ] add tooltips
 - [ ] display confidence behind list of File
 - [ ] display confidence behind list of Questions
