@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
     private Stage primaryStage;
@@ -558,14 +559,25 @@ public class Main extends Application {
         RadioButton option1 = new RadioButton("Loaded Files");
         option1.setStyle("-fx-padding: 4");
         option1.setOnAction(unused1 -> {
-            listToDisplay = quizFiles.stream().map(File::getName).toList();
-            ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
-            listQuestions.setItems(items);
+            listQuestions.getItems().clear();
+            listToDisplay = quizFiles.stream()
+                    .map(file -> file.getName() + " - ")
+                    .toList();
+            for (int i = 0; i < listToDisplay.size(); i++) {
+                String formatedString = listToDisplay.get(i)
+                        + questions.get(i).stream()
+                        .map(Question::getConfidence)
+                        .collect(Collectors.averagingDouble(Double::doubleValue));
+                listQuestions.getItems().add(formatedString);
+            }
         });
         RadioButton option2 = new RadioButton("Loaded Questions");
         option2.setStyle("-fx-padding: 4");
         option2.setOnAction(unused1 -> {
-            listToDisplay = questions.stream().flatMap(List::stream).map(Question::getQuestion).toList();
+            listToDisplay = questions.stream()
+                    .flatMap(List::stream)
+                    .map(question -> question.getQuestion() + " - " + question.getConfidence())
+                    .toList();
             ObservableList<String> items = FXCollections.observableArrayList(listToDisplay);
             listQuestions.setItems(items);
         });

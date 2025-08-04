@@ -78,6 +78,6 @@ Bsp.:
 - [x] disable time spacing on the line chart
   - [x] disable time spacing on the line chart
 - [ ] add tooltips
-- [ ] display confidence behind list of File
-- [ ] display confidence behind list of Questions
+- [x] display confidence behind list of File
+- [x] display confidence behind list of Questions
 - [ ] defat main
